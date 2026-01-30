@@ -1,0 +1,111 @@
+{% extends 'nhakhoa/base.html' %}
+
+{% block title %}Trang chủ - Phòng khám nha khoa{% endblock %}
+
+{% block content %}
+
+<!-- ===== BANNER ===== -->
+<section class="banner">
+    <div class="overlay">
+        <div class="banner-text">
+            <h1>NIỀNG RĂNG HÔM NAY</h1>
+            <h2>RẠNG RỠ NGÀY MAI</h2>
+            <p>Hệ thống phòng khám nha khoa hiện đại, uy tín</p>
+            <button onclick="openPopup()">Đăng ký ngay</button>
+        </div>
+    </div>
+</section>
+
+{% load static %}
+
+<!-- ===== GIỚI THIỆU ===== -->
+<section class="about">
+    <div class="container">
+        <h2>Về Phòng Khám Nha Khoa Smile</h2>
+
+        <p class="about-desc">
+            Nha Khoa Smile là hệ thống phòng khám nha khoa chất lượng cao,
+            ứng dụng công nghệ hiện đại trong chẩn đoán và điều trị.
+            Chúng tôi cam kết mang đến dịch vụ an toàn – hiệu quả – tận tâm
+            cho mọi khách hàng.
+        </p>
+
+        <div class="about-features">
+
+            <div class="feature-box">
+                <img src="{% static 'images/bs.jpg' %}" alt="Bác sĩ chuyên môn cao">
+                <h3>👨‍⚕️ Bác sĩ chuyên môn cao</h3>
+                <p>Đội ngũ bác sĩ giàu kinh nghiệm, tận tâm với khách hàng.</p>
+            </div>
+
+            <div class="feature-box">
+                <img src="{% static 'images/congnghe.jpg' %}" alt="Công nghệ hiện đại">
+                <h3>🦷 Công nghệ hiện đại</h3>
+                <p>Trang thiết bị đạt chuẩn quốc tế, hỗ trợ điều trị chính xác.</p>
+            </div>
+
+            <div class="feature-box">
+                <img src="{% static 'images/dichvu.jpg' %}" alt="Dịch vụ tận tình">
+                <h3>❤️ Dịch vụ tận tình</h3>
+                <p>Luôn đặt sự hài lòng và an toàn của khách hàng lên hàng đầu.</p>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<section class="branches">
+    <div class="container">
+        <h2 class="section-title">Hệ thống phòng khám & GIS</h2>
+        
+        <div class="branch-list">
+            
+            <div class="branch-card">
+                <div class="branch-img">
+                    <img src="{% static 'images/chinhanh1.png' %}" alt="Chi nhánh Quận 1">
+                </div>
+                <div class="branch-info">
+                    <h3>Chi nhánh 1</h3>
+                    <p class="address">📍 123 Nguyễn Huệ, Phường Sài Gòn , TPHCM</p>
+                    <a href="{% url 'chinhanh' %}" class="btn-map">Xem vị trí 🗺️</a>
+                </div>
+            </div>
+
+            <div class="branch-card">
+                <div class="branch-img">
+                    <img src="{% static 'images/chinhanh2.png' %}" alt="Chi nhánh Quận 7">
+                </div>
+                <div class="branch-info">
+                    <h3>Chi nhánh 2</h3>
+                    <p class="address">📍 456 Nguyễn Thị Thập, Phường Phú Mỹ , TPHCM</p>
+                    <a href="{% url 'chinhanh' %}" class="btn-map">Xem vị trí 🗺️</a>
+                </div>
+            </div>
+
+            <div class="branch-card">
+                <div class="branch-img">
+                    <img src="{% static 'images/chinhanh3.png' %}" alt="Chi nhánh Thủ Đức">
+                </div>
+                <div class="branch-info">
+                    <h3>Chi nhánh 3</h3>
+                    <p class="address">📍 117 Nguyễn Bỉnh Khiêm, Phường Tân Định TP.HCM.</p>
+                    <a href="{% url 'chinhanh' %}" class="btn-map">Xem vị trí 🗺️</a>
+                </div>
+            </div>
+
+            <div class="branch-card">
+                <div class="branch-img">
+                    <img src="{% static 'images/chinhanh4.png' %}" alt="Chi nhánh Biên Hòa">
+                </div>
+                <div class="branch-info">
+                    <h3>Chi nhánh 4</h3>
+                    <p class="address">📍 101 Đồng Khởi, TP. Biên Hòa</p>
+                    <a href="{% url 'chinhanh' %}" class="btn-map">Xem vị trí 🗺️</a>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+{% endblock %}

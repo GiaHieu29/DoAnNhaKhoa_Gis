@@ -1,0 +1,33 @@
+{% extends 'nhakhoa/base.html' %}
+{% load static %}
+
+{% block title %}Giới thiệu - Nha Khoa Smile{% endblock %}
+
+{% block content %}
+
+<section class="about-banner"
+    style="background-image: url({% static 'images/vechungtoi.avif' %});">
+
+    
+    <div class="about-banner-overlay">
+        <h1>Về Chúng Tôi</h1>
+        <p>Hành trình kiến tạo nụ cười hạnh phúc</p>
+    </div>
+</section>
+
+<section class="about-content">
+    <div class="container">
+        <h2>Lịch sử hình thành</h2>
+        <p>
+            Thành lập từ năm 2010, Nha Khoa Smile tự hào là đơn vị tiên phong
+            trong việc ứng dụng công nghệ 4.0 vào điều trị nha khoa.
+        </p>
+        <p>
+            Phương châm của chúng tôi là
+            <strong>“Bảo tồn răng thật tối đa”</strong>,
+            giúp khách hàng khỏe mạnh bền vững.
+        </p>
+    </div>
+</section>
+
+{% endblock %}

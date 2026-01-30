@@ -1,0 +1,88 @@
+/* ===== HEADER ===== */
+.clinic-header {
+    background: #ffffff;
+    border-bottom: 1px solid #e6e6e6;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.clinic-header-inner {
+    max-width: 1200px;
+    margin: auto;
+    padding: 16px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* ===== LEFT GROUP ===== */
+.left-group {
+    display: flex;
+    align-items: center;
+    gap: 40px;
+}
+
+/* ===== LOGO ===== */
+.logo {
+    font-size: 22px;
+    font-weight: 700;
+    color: #0d6efd;
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
+}
+
+.logo span {
+    margin-left: 6px;
+}
+
+/* ===== MENU ===== */
+.clinic-menu {
+    display: flex;
+    gap: 26px;
+}
+
+.clinic-menu a {
+    text-decoration: none;
+    color: #333;
+    font-weight: 500;
+    font-size: 15px;
+    position: relative;
+    padding: 6px 0;
+}
+
+.clinic-menu a:hover {
+    color: #0d6efd;
+}
+
+.clinic-menu a::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: #0d6efd;
+    transition: 0.25s;
+}
+
+.clinic-menu a:hover::after {
+    width: 100%;
+}
+
+/* ===== BUTTON ===== */
+.btn-book {
+    background: #0d6efd;
+    color: white;
+    border: none;
+    padding: 10px 22px;
+    border-radius: 25px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.btn-book:hover {
+    background: #0b5ed7;
+}

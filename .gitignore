@@ -1,0 +1,13 @@
+# Bỏ qua thư mục môi trường ảo
+venv/
+env/
+.env
+
+# Bỏ qua file cache của Python
+__pycache__/
+*.pyc
+
+# Bỏ qua file database (Thường là không up, NHƯNG...)
+# db.sqlite3  <-- Mình đang để dấu # ở trước để BẠN UP LUÔN DATABASE
+# Vì bạn đã nhập dữ liệu bản đồ vất vả rồi, nên up luôn file này
+# để các bạn trong nhóm tải về là có luôn dữ liệu bản đồ nhé!

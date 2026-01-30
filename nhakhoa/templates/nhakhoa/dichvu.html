@@ -1,0 +1,52 @@
+{% extends 'nhakhoa/base.html' %}
+{% load static %}
+
+{% block title %}Dịch vụ - Nha Khoa Smile{% endblock %}
+
+{% block content %}
+
+{% static 'images/banner.webp' as banner_bg %}
+<section class="sub-banner" style="background-image: url('{{ banner_bg }}'); height: 350px; background-size: cover; background-position: center; position: relative; display: flex; align-items: center; justify-content: center;">
+    <div class="overlay" style="background: rgba(0,0,0,0.5); position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; color: white;">
+        <h1 style="font-size: 42px; font-weight: bold; margin-bottom: 10px; text-transform: uppercase;">Dịch Vụ Của Chúng Tôi</h1>
+        <p style="font-size: 18px;">Giải pháp nha khoa toàn diện cho nụ cười của bạn</p>
+    </div>
+</section>
+
+<div class="container" style="padding: 80px 20px;">
+    
+    <div class="section-header" style="text-align: center; margin-bottom: 50px;">
+        <h2 style="color: #0d6efd; font-size: 32px; font-weight: 800; text-transform: uppercase; margin-bottom: 15px;">Dịch vụ nổi bật</h2>
+        <p style="color: #666; max-width: 700px; margin: 0 auto;">Chúng tôi cung cấp các dịch vụ nha khoa chất lượng cao với công nghệ tiên tiến nhất hiện nay.</p>
+    </div>
+
+    <div class="service-grid">
+        
+        {% for item in ds_dv %}
+        <div class="service-card">
+            <div class="service-img">
+                <img src="{% static item.link_anh %}" alt="{{ item.ten_dich_vu }}">
+            </div>
+            <div class="service-content">
+                <h3>{{ item.ten_dich_vu }}</h3>
+                
+                <p class="desc">{{ item.mo_ta }}</p>
+                
+                <p class="price">{{ item.gia }}</p>
+                
+                <button class="btn-service" onclick="openPopup()">Tư vấn ngay</button>
+            </div>
+        </div>
+        {% endfor %}
+
+        {% if not ds_dv %}
+        <div style="grid-column: 1/-1; text-align: center; padding: 40px; background: #fff; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.05);">
+            <p style="font-size: 18px; color: #666;">Hiện chưa có dịch vụ nào được cập nhật.</p>
+            <p style="font-size: 14px; color: #999;">(Vui lòng truy cập trang Admin để thêm dịch vụ)</p>
+        </div>
+        {% endif %}
+
+    </div>
+</div>
+
+{% endblock %}

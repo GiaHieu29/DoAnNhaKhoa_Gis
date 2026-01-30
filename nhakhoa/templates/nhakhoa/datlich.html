@@ -1,0 +1,162 @@
+{% extends 'nhakhoa/base.html' %}
+{% load static %}
+
+{% block title %}Đặt lịch thành công - Nha Khoa Smile{% endblock %}
+
+{% block content %}
+<div class="container" style="padding: 60px 20px; max-width: 900px;">
+    
+    <div style="text-align: center; margin-bottom: 40px;">
+        <img src="https://cdn-icons-png.flaticon.com/512/190/190411.png" style="width: 80px; margin-bottom: 20px;">
+        <h1 style="color: #28a745; font-weight: bold; text-transform: uppercase;">Đặt Lịch Hẹn Thành Công!</h1>
+        <p style="font-size: 18px; color: #666;">Cảm ơn <b>{{ lich_hen.ho_ten }}</b> đã tin tưởng. Chúng tôi đã nhận được yêu cầu của bạn.</p>
+    </div>
+
+    <div class="row" style="display: flex; flex-wrap: wrap; gap: 30px;">
+        
+        <div style="flex: 1; min-width: 300px; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.05); border: 1px solid #eee;">
+            <h3 style="color: #0d6efd; margin-bottom: 20px; border-bottom: 2px solid #f0f0f0; padding-bottom: 10px;">
+                📄 Phiếu xác nhận
+            </h3>
+            
+            <style>
+                .info-row { margin-bottom: 15px; display: flex; justify-content: space-between; }
+                .info-label { color: #888; font-weight: 500; }
+                .info-val { font-weight: bold; color: #333; }
+                .btn-routing {
+                    background: linear-gradient(45deg, #FF512F, #DD2476);
+                    color: white; border: none; padding: 10px 20px;
+                    border-radius: 50px; font-weight: bold; cursor: pointer;
+                    width: 100%; margin-top: 10px; transition: 0.3s;
+                    box-shadow: 0 4px 15px rgba(221, 36, 118, 0.3);
+                }
+                .btn-routing:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(221, 36, 118, 0.4); }
+                .distance-result {
+                    display: none; background: #e3f2fd; color: #0d6efd;
+                    padding: 10px; border-radius: 8px; margin-top: 15px;
+                    text-align: center; border: 1px dashed #0d6efd;
+                }
+            </style>
+
+            <div class="info-row">
+                <span class="info-label">Mã phiếu:</span>
+                <span class="info-val">#{{ lich_hen.id }}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Khách hàng:</span>
+                <span class="info-val">{{ lich_hen.ho_ten }}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Số điện thoại:</span>
+                <span class="info-val">{{ lich_hen.so_dien_thoai }}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Dịch vụ:</span>
+                <span class="info-val" style="color: #d63384;">{{ lich_hen.dich_vu.ten_dich_vu|default:"Chưa chọn" }}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Ngày hẹn:</span>
+                <span class="info-val">{{ lich_hen.ngay_hen_mong_muon|date:"d/m/Y"|default:"Sẽ sắp xếp sau" }}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Chi nhánh:</span>
+                <span class="info-val">{{ lich_hen.chi_nhanh.ten_chi_nhanh }}</span>
+            </div>
+
+            <div style="margin-top: 30px; text-align: center;">
+                <a href="{% url 'index' %}" style="color: #666; text-decoration: none;">← Về trang chủ</a>
+            </div>
+        </div>
+
+        <div style="flex: 1; min-width: 300px;">
+            <h3 style="color: #0d6efd; margin-bottom: 20px;">📍 Vị trí trên bản đồ (GIS)</h3>
+            <p style="margin-bottom: 10px; font-size: 14px; color: #555;">
+                <i class="fas fa-map-marker-alt" style="color: red;"></i> Địa chỉ: <b>{{ address }}</b>
+            </p>
+            
+            <div style="width: 100%; height: 250px; border-radius: 15px; overflow: hidden; box-shadow: 0 5px 20px rgba(0,0,0,0.1);">
+                {% if map_url %}
+                    <iframe src="{{ map_url }}" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+                {% else %}
+                    <div style="width: 100%; height: 100%; background: #eee; display: flex; align-items: center; justify-content: center; color: #999;">
+                        Chưa cập nhật bản đồ
+                    </div>
+                {% endif %}
+            </div>
+
+            <div style="margin-top: 20px;">
+                <button onclick="batDauTinhToanGIS()" class="btn-routing">
+                    <i class="fas fa-route"></i> Tính khoảng cách & Dẫn đường
+                </button>
+                
+                <div id="status-gis" style="margin-top: 10px; font-size: 13px; color: #888; text-align: center; font-style: italic;">
+                    Dữ liệu GIS đầu vào: GPS của bạn & Database
+                </div>
+
+                <div id="ket-qua-gis" class="distance-result">
+                    </div>
+            </div>
+
+            <div style="text-align: right; margin-top: 10px; font-size: 12px; color: #aaa;">
+                Lat: {{ lat|stringformat:"f" }} | Lng: {{ lng|stringformat:"f" }}
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script>
+    function tinhKhoangCach(lat1, lon1, lat2, lon2) {
+        const R = 6371; // Bán kính trái đất (km)
+        const dLat = (lat2 - lat1) * Math.PI / 180;
+        const dLon = (lon2 - lon1) * Math.PI / 180;
+        const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                  Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon/2) * Math.sin(dLon/2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        return (R * c).toFixed(2);
+    }
+
+    function batDauTinhToanGIS() {
+        const statusDiv = document.getElementById("status-gis");
+        const resultBox = document.getElementById("ket-qua-gis");
+
+        if (!navigator.geolocation) {
+            alert("Trình duyệt không hỗ trợ GPS!");
+            return;
+        }
+
+        statusDiv.innerHTML = "📡 Đang lấy tọa độ vệ tinh...";
+
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                // 1. Lấy tọa độ User (GPS)
+                const userLat = position.coords.latitude;
+                const userLng = position.coords.longitude;
+
+                // 2. Lấy tọa độ Chi nhánh 
+                const clinicLat = parseFloat("{{ lat|stringformat:'f' }}");
+                const clinicLng = parseFloat("{{ lng|stringformat:'f' }}");
+
+                // 3. Tính khoảng cách
+                const distance = tinhKhoangCach(userLat, userLng, clinicLat, clinicLng);
+
+                // 4. Hiển thị kết quả & Link dẫn đường chuẩn
+                resultBox.style.display = "block";
+                resultBox.innerHTML = `
+                    <div style="font-size: 18px; font-weight: bold;">Khoảng cách: ${distance} km</div>
+                    <a href="https://www.google.com/maps/dir/?api=1&destination=${clinicLat},${clinicLng}" 
+                       target="_blank" 
+                       style="display: block; margin-top: 5px; text-decoration: underline; color: #0d6efd;">
+                       🚀 Bấm để mở bản đồ dẫn đường
+                    </a>
+                `;
+                statusDiv.innerHTML = "✅ Tính toán hoàn tất!";
+            },
+            () => {
+                statusDiv.innerHTML = "❌ Không lấy được vị trí. Hãy bật GPS!";
+                statusDiv.style.color = "red";
+            }
+        );
+    }
+</script>
+{% endblock %}

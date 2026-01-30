@@ -1,0 +1,635 @@
+/* ================== RESET ================== */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: "Segoe UI", Arial, sans-serif;
+    background: #f4f6f8;
+    color: #333;
+    line-height: 1.6;
+    overflow-x: hidden;
+}
+
+/* ================== COMMON ================== */
+.container {
+    max-width: 1200px;
+    margin: auto;
+    padding: 60px 20px;
+}
+
+h2 {
+    text-align: center;
+    margin-bottom: 30px;
+    color: #0d6efd;
+    font-size: 32px;
+    font-weight: 700;
+}
+
+/* ================== HEADER ================== */
+.top-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px 40px;
+    background: #ffffff;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.logo {
+    font-size: 24px;
+    font-weight: bold;
+    color: #0d6efd;
+    text-transform: uppercase;
+}
+
+.menu {
+    display: flex;
+    gap: 30px;
+}
+
+.menu a {
+    text-decoration: none;
+    color: #333;
+    font-weight: 600;
+    font-size: 16px;
+    transition: color 0.3s;
+}
+
+.menu a:hover {
+    color: #0d6efd;
+}
+
+.btn-book {
+    background: #0d6efd;
+    color: white;
+    border: none;
+    padding: 10px 25px;
+    border-radius: 50px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background 0.3s;
+}
+
+.btn-book:hover {
+    background: #0b5ed7;
+}
+
+/* ================== BANNER ================== */
+.banner {
+    height: 550px;
+    background-image: url("../images/banner.webp"); /* Kiểm tra lại tên file ảnh */
+    background-size: cover;
+    background-position: center;
+    position: relative;
+}
+
+.banner .overlay {
+    height: 100%;
+    width: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.banner-text {
+    color: white;
+    text-align: center;
+    max-width: 700px;
+    padding: 20px;
+}
+
+.banner-text h1 {
+    font-size: 48px;
+    margin-bottom: 10px;
+    font-weight: 800;
+}
+
+.banner-text h2 {
+    font-size: 36px;
+    color: #ffd43b;
+    margin-bottom: 20px;
+}
+
+.banner-text p {
+    font-size: 18px;
+    margin-bottom: 30px;
+}
+
+.banner-text button {
+    padding: 12px 35px;
+    background: #0d6efd;
+    border: none;
+    color: white;
+    font-size: 18px;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.banner-text button:hover {
+    background: #0b5ed7;
+    transform: scale(1.05);
+}
+
+/* ================== ABOUT (GIỚI THIỆU) ================== */
+.about {
+    background: #ffffff;
+}
+
+.about-desc {
+    max-width: 800px;
+    margin: 0 auto 50px;
+    text-align: center;
+    font-size: 18px;
+    color: #555;
+    line-height: 1.8;
+}
+
+/* ================== ABOUT FEATURES (3 KHỐI ẢNH) ================== */
+.about-features {
+    display: flex;
+    justify-content: space-between;
+    gap: 30px;
+}
+
+.feature-box {
+    flex: 1;
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+    overflow: hidden;
+    text-align: center;
+    transition: transform 0.3s ease;
+    border: 1px solid #eee;
+}
+
+.feature-box:hover {
+    transform: translateY(-10px);
+}
+
+.feature-box img {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    display: block;
+}
+
+.feature-box h3 {
+    margin: 20px 0 10px;
+    font-size: 20px;
+    color: #333;
+}
+
+.feature-box p {
+    padding: 0 20px 25px;
+    font-size: 15px;
+    color: #666;
+}
+
+/* ===== ABOUT BANNER ===== */
+.about-banner {
+    height: 100vh;
+    background-size: cover;
+    background-position: center;
+    position: relative;
+}
+
+.about-banner-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: #fff;
+}
+
+.about-banner-overlay h1 {
+    font-size: 56px;
+    font-weight: 700;
+    margin-bottom: 12px;
+}
+
+.about-banner-overlay p {
+    font-size: 20px;
+    opacity: 0.9;
+}
+
+.about-content {
+    padding: 80px 0;
+}
+
+/* ================== TRANG DỊCH VỤ (SERVICE GRID) ================== */
+
+/* 1. Thiết lập lưới 3 cột */
+.service-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* 3 cột đều nhau */
+    gap: 30px; /* Khoảng cách giữa các ô */
+}
+
+/* 2. Thẻ Card Dịch vụ */
+.service-card {
+    background: white;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    border: 1px solid #f0f0f0;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Hiệu ứng bay lên khi di chuột */
+.service-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 20px 40px rgba(13, 110, 253, 0.15);
+    border-color: #0d6efd;
+}
+
+/* 3. Ảnh dịch vụ */
+.service-img {
+    height: 220px;
+    overflow: hidden;
+}
+
+.service-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+
+.service-card:hover .service-img img {
+    transform: scale(1.1); /* Zoom ảnh khi hover */
+}
+
+/* 4. Nội dung bên trong */
+.service-content {
+    padding: 25px;
+    text-align: center;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.service-content h3 {
+    font-size: 20px;
+    color: #333;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+
+.service-content .desc {
+    color: #666;
+    font-size: 14px;
+    line-height: 1.5;
+    margin-bottom: 15px;
+    flex-grow: 1; /* Đẩy giá và nút xuống đáy cho đều */
+}
+
+.service-content .price {
+    color: #d9534f; /* Màu đỏ cho giá */
+    font-weight: bold;
+    font-size: 18px;
+    margin-bottom: 20px;
+}
+
+/* 5. Nút Tư vấn */
+.btn-service {
+    padding: 10px 25px;
+    background: white;
+    color: #0d6efd;
+    border: 1px solid #0d6efd;
+    border-radius: 50px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.btn-service:hover {
+    background: #0d6efd;
+    color: white;
+}
+
+/* --- RESPONSIVE --- */
+@media (max-width: 900px) {
+    .service-grid {
+        grid-template-columns: repeat(2, 1fr); /* Tablet: 2 cột */
+    }
+}
+
+@media (max-width: 600px) {
+    .service-grid {
+        grid-template-columns: 1fr; /* Mobile: 1 cột */
+    }
+}
+/* ================== TRANG LIÊN HỆ (STYLE MỚI) ================== */
+
+/* 1. Layout chia cột */
+.contact-grid {
+    display: flex;
+    gap: 50px;
+    align-items: flex-start;
+}
+
+/* 2. Style cột Thông tin (Bên trái) */
+.contact-info {
+    flex: 1;
+}
+
+.info-box {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    background: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+    border: 1px solid #f0f0f0;
+    transition: transform 0.3s;
+}
+
+.info-box:hover {
+    transform: translateX(10px); /* Hiệu ứng trượt nhẹ sang phải */
+    border-color: #0d6efd;
+}
+
+.info-box .icon {
+    font-size: 30px;
+    width: 60px;
+    height: 60px;
+    background: #e7f1ff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.info-box .details h3 {
+    margin: 0 0 5px;
+    font-size: 16px;
+    color: #333;
+}
+
+.info-box .details p {
+    margin: 0;
+    color: #555;
+    font-size: 15px;
+}
+
+.info-box .highlight {
+    color: #d9534f; /* Màu đỏ cho Hotline */
+    font-weight: bold;
+    font-size: 18px;
+}
+
+/* 3. Style Form liên hệ (Bên phải) */
+.contact-form-wrapper {
+    flex: 1;
+    background: white;
+    padding: 40px;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.08); /* Đổ bóng đậm tạo chiều sâu */
+    border: 1px solid #eee;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #333;
+}
+
+.form-group input, 
+.form-group textarea {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 15px;
+    transition: 0.3s;
+    outline: none;
+    font-family: inherit;
+}
+
+.form-group input:focus, 
+.form-group textarea:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.1);
+}
+
+.btn-submit {
+    width: 100%;
+    padding: 14px;
+    background: #0d6efd;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.btn-submit:hover {
+    background: #0b5ed7;
+    transform: translateY(-2px);
+}
+
+/* ================== PHẦN CHĂM SÓC KHÁCH HÀNG ================== */
+.customer-care {
+    background-color: #f8f9fa; /* Nền xám nhẹ khác biệt */
+    padding: 80px 0;
+}
+
+.care-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 30px;
+}
+
+.care-card {
+    background: white;
+    padding: 40px 30px;
+    border-radius: 15px;
+    text-align: center;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    transition: transform 0.3s;
+}
+
+.care-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+}
+
+.care-icon {
+    font-size: 40px;
+    margin-bottom: 20px;
+}
+
+.care-card h3 {
+    margin-bottom: 15px;
+    color: #0d6efd;
+    font-size: 20px;
+}
+
+.care-card p {
+    color: #666;
+    margin-bottom: 25px;
+    line-height: 1.6;
+}
+
+.care-card a {
+    color: #0d6efd;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.care-card a:hover {
+    text-decoration: underline;
+}
+
+/* ================== RESPONSIVE (MOBILE) ================== */
+@media (max-width: 900px) {
+    .contact-grid {
+        flex-direction: column; /* Xếp dọc trên mobile */
+    }
+    
+    .care-grid {
+        grid-template-columns: 1fr; /* 1 cột trên mobile */
+    }
+    
+    .contact-form-wrapper {
+        width: 100%;
+        padding: 25px;
+    }
+}
+/* ================== HỆ THỐNG CHI NHÁNH (STYLE RIÊNG) ================== */
+
+/* 1. Khung nền chung */
+.branches {
+    background-color: #f8f9fa;
+    padding: 60px 0;
+}
+
+/* 2. Tiêu đề mục */
+.branches .section-title {
+    text-align: center;
+    color: #0d6efd;
+    font-size: 32px;
+    margin-bottom: 40px;
+    font-weight: 800;
+    text-transform: uppercase;
+}
+
+/* 3. LƯỚI 2 CỘT (QUAN TRỌNG) */
+.branch-list {
+    display: grid;
+    /* repeat(2, 1fr) = Chia đôi màn hình thành 2 cột */
+    grid-template-columns: repeat(2, 1fr); 
+    gap: 30px; /* Khoảng cách giữa các ô */
+    max-width: 1000px;
+    margin: 0 auto; /* Căn giữa danh sách */
+}
+
+/* 4. Thẻ Card từng chi nhánh */
+.branch-card {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden; /* Bo tròn ảnh theo khung */
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    border: 1px solid #eee;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.3s ease;
+}
+
+/* Hiệu ứng khi di chuột vào card */
+.branch-card:hover {
+    transform: translateY(-5px); /* Bay lên nhẹ */
+    box-shadow: 0 15px 30px rgba(13, 110, 253, 0.15);
+}
+
+/* 5. Khung ảnh (Cố định chiều cao để ảnh đều nhau) */
+.branch-img {
+    width: 100%;
+    height: 280px; /* Chiều cao cố định */
+    overflow: hidden;
+}
+
+.branch-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Cắt ảnh tự động để lấp đầy khung */
+    transition: transform 0.5s ease;
+}
+
+.branch-card:hover .branch-img img {
+    transform: scale(1.05); /* Zoom ảnh nhẹ khi hover */
+}
+
+/* 6. Phần thông tin chữ */
+.branch-info {
+    padding: 20px;
+    text-align: center;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.branch-info h3 {
+    color: #0d6efd;
+    font-size: 20px;
+    margin-bottom: 10px;
+    font-weight: 700;
+}
+
+.branch-info .address {
+    color: #555;
+    margin-bottom: 15px;
+    font-size: 15px;
+}
+
+/* 7. Nút xem bản đồ */
+.btn-map {
+    display: inline-block;
+    padding: 8px 20px;
+    border: 1px solid #0d6efd;
+    color: #0d6efd;
+    text-decoration: none;
+    border-radius: 5px;
+    font-weight: bold;
+    transition: all 0.3s;
+}
+
+.btn-map:hover {
+    background: #0d6efd;
+    color: white;
+}
+
+/* 8. RESPONSIVE (Điện thoại thì về 1 cột) */
+@media (max-width: 768px) {
+    .branch-list {
+        grid-template-columns: 1fr; /* Về 1 cột dọc */
+    }
+    .branch-img {
+        height: 220px; /* Ảnh nhỏ lại chút trên đt */
+    }
+}
