@@ -1,94 +1,157 @@
 {% extends 'nhakhoa/base.html' %}
 {% load static %}
 
-{% block title %}Hệ thống chi nhánh - GIS{% endblock %}
+{% block title %}Hệ thống Chi nhánh - Nha Khoa Smile{% endblock %}
 
 {% block content %}
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-<div class="container" style="display: flex; gap: 30px; height: 85vh; padding-top: 20px; padding-bottom: 20px;">
-    
-    <div style="flex: 1; overflow-y: auto; padding-right: 10px;">
-        <h2 style="text-align: left; color: #28a745;">HỆ THỐNG PHÒNG KHÁM</h2>
-        <p style="margin-bottom: 20px; color: #666;">Chọn chi nhánh để xem vị trí trên bản đồ GIS</p>
-        
+<link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.css" />
+<script src="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.js"></script>
+
+<link rel="stylesheet" href="{% static 'css/chinhanh.css' %}">
+
+<div class="container py-5">
+    <div class="text-center mb-5">
+        <h2 class="fw-bold text-uppercase">Hệ Thống Chi Nhánh</h2>
+        <p class="text-muted">Chọn chi nhánh để xem chỉ đường chi tiết</p>
+    </div>
+
+    <div class="row g-4">
         {% for cn in ds_cn %}
-        <div class="branch-item" 
-            onclick="zoomToLocation({{ cn.vi_do|stringformat:'f' }}, {{ cn.kinh_do|stringformat:'f' }}, '{{ cn.ten_chi_nhanh }}')"
-             style="border: 1px solid #ddd; padding: 15px; margin-bottom: 15px; border-radius: 8px; cursor: pointer; transition: 0.3s; background: white; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
-            
-            <h3 style="font-size: 18px; color: #0d6efd; margin-top: 0;">{{ cn.ten_chi_nhanh }}</h3>
-            <p style="margin-bottom: 5px; font-size: 14px; color: #555;">
-                <i class="fas fa-map-marker-alt" style="color: red;"></i> {{ cn.dia_chi }}
-            </p>
-            <div style="font-size: 12px; color: #888; font-family: monospace;">
-                Lat: {{ cn.vi_do }} | Lng: {{ cn.kinh_do }}
+        <div class="col-md-6 col-lg-4">
+            <div class="branch-item">
+                <div class="mini-map-preview" id="preview-{{ cn.id }}">
+                    <div class="map-overlay" onclick="moBanDoTo('{{ cn.ten_chi_nhanh }}', '{{ cn.vi_do }}', '{{ cn.kinh_do }}')">
+                        <span class="btn-preview"><i class="fas fa-expand-arrows-alt me-2"></i>Phóng to</span>
+                    </div>
+                </div>
+
+                <div class="branch-info">
+                    <h3 class="branch-title">{{ cn.ten_chi_nhanh }}</h3>
+                    <div class="info-line"><i class="fas fa-map-marker-alt"></i><span>{{ cn.dia_chi }}</span></div>
+                    <div class="info-line"><i class="fas fa-phone-alt"></i><span>{{ cn.so_dien_thoai }}</span></div>
+                    
+                    <button class="btn-route-big" onclick="moBanDoTo('{{ cn.ten_chi_nhanh }}', '{{ cn.vi_do }}', '{{ cn.kinh_do }}')">
+                        <i class="fas fa-location-arrow me-2"></i> Xem đường đi
+                    </button>
+                </div>
             </div>
             
-            <button style="margin-top: 10px; padding: 5px 15px; background: #e9ecef; border: none; border-radius: 20px; color: #333; font-size: 13px; cursor: pointer;">
-                <i class="fas fa-search-location"></i> Xem trên bản đồ
-            </button>
+            <script>
+                (function() {
+                    var lat = parseFloat("{{ cn.vi_do|default:'0' }}");
+                    var lng = parseFloat("{{ cn.kinh_do|default:'0' }}");
+
+                    if (lat !== 0 && lng !== 0) {
+                        var mapId = "preview-{{ cn.id }}";
+                        var map = L.map(mapId, {
+                            center: [lat, lng],
+                            zoom: 14,
+                            zoomControl: false,
+                            scrollWheelZoom: false,
+                            dragging: false
+                        });
+
+                        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+                        L.marker([lat, lng]).addTo(map);
+                    }
+                })();
+            </script>
         </div>
-        {% empty %}
-            <p>Chưa có dữ liệu chi nhánh.</p>
         {% endfor %}
     </div>
+</div>
 
-    <div style="flex: 2; background: #e9ecef; border-radius: 15px; position: relative; overflow: hidden; border: 2px solid #fff; box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
-        <div id="map" style="width: 100%; height: 100%;"></div>
+<div class="map-modal-overlay" id="mapModal">
+    <div class="map-modal-content">
+        <div class="map-modal-header">
+            <div>
+                <h5 class="fw-bold mb-0" id="modalTitle">Đang tìm đường...</h5>
+                <small class="text-muted" id="modalStatus">Vui lòng chờ lấy vị trí của bạn</small>
+            </div>
+            <button class="btn-close-map" onclick="dongBanDoTo()"><i class="fas fa-times"></i></button>
+        </div>
+
+        <div id="big-map-container"></div>
     </div>
-
 </div>
 
 <script>
-    // 1. Khởi tạo bản đồ (Tọa độ trung tâm TP.HCM)
-    var map = L.map('map').setView([10.762622, 106.660172], 12);
+    var bigMap = null;
+    var routingControl = null;
 
-    // 2. Thêm lớp nền bản đồ (OpenStreetMap - Miễn phí)
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '© OpenStreetMap contributors',
-        maxZoom: 19
-    }).addTo(map);
+    function moBanDoTo(tenChiNhanh, destLat, destLng) {
+        var modal = document.getElementById('mapModal');
+        modal.style.display = 'flex';
+        document.getElementById('modalTitle').innerText = "Dẫn đường đến: " + tenChiNhanh;
+        document.getElementById('modalStatus').innerText = "Đang lấy vị trí GPS của bạn...";
+        destLat = parseFloat(destLat);
+        destLng = parseFloat(destLng);
 
-    // 3. Tạo biểu tượng marker đẹp hơn (Optional)
-    var customIcon = L.icon({
-        iconUrl: 'https://cdn-icons-png.flaticon.com/512/684/684908.png', // Icon định vị
-        iconSize: [38, 38],
-        iconAnchor: [19, 38],
-        popupAnchor: [0, -38]
-    });
+        if (!bigMap) {
+            bigMap = L.map('big-map-container').setView([destLat, destLng], 13);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap'
+            }).addTo(bigMap);
+        } else {
+            setTimeout(function(){ bigMap.invalidateSize(); }, 100);
+        }
 
-    // 4. Vòng lặp Javascript để Ghim các điểm từ Database lên bản đồ
-    // (Django sẽ render dữ liệu vào giữa đoạn script này)
-    {% for cn in ds_cn %}
-        L.marker([{{ cn.vi_do }}, {{ cn.kinh_do }}], {icon: customIcon})
-         .addTo(map)
-         .bindPopup("<b>{{ cn.ten_chi_nhanh }}</b><br>{{ cn.dia_chi }}");
-    {% endfor %}
+        // Lấy vị trí người dùng & Vẽ đường
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(function(position) {
+                var userLat = position.coords.latitude;
+                var userLng = position.coords.longitude;
+                
+                document.getElementById('modalStatus').innerText = "Đã tìm thấy vị trí của bạn! Đang vẽ đường...";
+                document.getElementById('modalStatus').classList.add('text-success');
 
-    // 5. Hàm xử lý khi bấm vào danh sách bên trái
-    function zoomToLocation(lat, lng, name) {
-        // Hiệu ứng bay tới vị trí (FlyTo)
-        map.flyTo([lat, lng], 16, {
-            animate: true,
-            duration: 1.5 // Thời gian bay 1.5 giây
-        });
+                if (routingControl) {
+                    bigMap.removeControl(routingControl);
+                }
 
-        // Tự động mở Popup tên chi nhánh
-        L.popup()
-            .setLatLng([lat, lng])
-            .setContent("<b>" + name + "</b>")
-            .openOn(map);
+                // Vẽ đường đi
+                routingControl = L.Routing.control({
+                    waypoints: [
+                        L.latLng(userLat, userLng),   // Điểm đi
+                        L.latLng(destLat, destLng)    // Điểm đến
+                    ],
+                    lineOptions: { styles: [{color: '#0d6efd', opacity: 0.8, weight: 6}] },
+                    createMarker: function(i, wp, nWps) {
+                        if (i === 0) {
+                            return L.marker(wp.latLng, {
+                                icon: L.icon({
+                                    iconUrl: 'https://cdn-icons-png.flaticon.com/512/6676/6676632.png',
+                                    iconSize: [30, 30], iconAnchor: [15, 30]
+                                })
+                            }).bindPopup("Bạn ở đây");
+                        } else if (i === nWps - 1) {
+                            return L.marker(wp.latLng).bindPopup(tenChiNhanh);
+                        }
+                    },
+                    addWaypoints: false,
+                    draggableWaypoints: false,
+                    fitSelectedRoutes: true,
+                    show: false
+                }).addTo(bigMap);
+
+            }, function(error) {
+                alert("Không thể lấy vị trí. Vui lòng bật GPS.");
+                document.getElementById('modalStatus').innerText = "Lỗi: Không tìm thấy GPS";
+            });
+        } else {
+            alert("Trình duyệt không hỗ trợ GPS.");
+        }
+    }
+
+    function dongBanDoTo() {
+        document.getElementById('mapModal').style.display = 'none';
+        if (routingControl && bigMap) {
+            bigMap.removeControl(routingControl);
+            routingControl = null;
+        }
     }
 </script>
-
-<style>
-    /* Hiệu ứng hover cho danh sách */
-    .branch-item:hover {
-        background-color: #f8f9fa !important;
-        border-color: #0d6efd !important;
-        transform: translateY(-2px);
-    }
-</style>
 {% endblock %}

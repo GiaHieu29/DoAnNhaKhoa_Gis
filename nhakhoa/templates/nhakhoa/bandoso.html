@@ -1,0 +1,204 @@
+{% extends 'nhakhoa/base.html' %}
+{% load static %}
+
+{% block title %}Bản đồ số GIS - Nha Khoa Smile{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.css" />
+<script src="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.js"></script>
+
+<link rel="stylesheet" href="{% static 'css/gis_map.css' %}">
+
+<div class="gis-wrapper">
+    <div class="gis-sidebar">
+        <div class="sidebar-head">
+            <div class="app-title">
+                <i class="fas fa-map-marked-alt"></i> BẢN ĐỒ SỐ
+            </div>
+            <div class="text-muted small">Quản lý vị trí khách hàng & Chi nhánh</div>
+            
+            <div class="search-wrap">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" class="search-input" id="searchInp" placeholder="Tìm tên khách, SĐT..." onkeyup="filterList()">
+            </div>
+
+            <div class="filter-group">
+                <button class="btn-filter active">Tất cả</button>
+                <button class="btn-filter">Đã đặt lịch</button>
+                <button class="btn-filter">Đã hoàn thành</button>
+            </div>
+        </div>
+
+        <div class="customer-list" id="listArea">
+            <div class="text-center mt-5 text-muted">
+                <i class="fas fa-spinner fa-spin"></i> Đang tải dữ liệu...
+            </div>
+        </div>
+        
+        <div class="p-2 text-center small text-muted border-top">
+            Hệ thống có <b id="count">0</b> khách hàng đã đặt lịch
+        </div>
+    </div>
+
+    <div class="gis-map-area">
+        <div id="map"></div>
+        
+        <div class="route-bar" id="routeBar">
+            <div class="rb-item">
+                <div class="rb-label">Khách hàng</div>
+                <div class="rb-val text-primary" id="rbName">...</div>
+            </div>
+            <div class="rb-item">
+                <div class="rb-label">Khoảng cách</div>
+                <div class="rb-val text-danger" id="rbDist">...</div>
+            </div>
+            <div class="rb-item">
+                <div class="rb-label">Thời gian</div>
+                <div class="rb-val text-success" id="rbTime">...</div>
+            </div>
+            <button class="btn btn-sm btn-light rounded-circle shadow-sm" onclick="closeRoute()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+    
+    const branches = JSON.parse("{{ json_chi_nhanh|escapejs }}");
+    const bookings = JSON.parse("{{ json_lich_su|escapejs }}");
+
+    // 2. KHỞI TẠO BẢN ĐỒ
+    var map = L.map('map', {zoomControl: false}).setView([10.7769, 106.7009], 13);
+    
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© Nha Khoa Smile'
+    }).addTo(map);
+    
+    L.control.zoom({position: 'bottomright'}).addTo(map);
+
+    var clinicIcon = L.icon({ iconUrl: 'https://cdn-icons-png.flaticon.com/512/3063/3063176.png', iconSize: [40, 40], iconAnchor: [20, 40], popupAnchor: [0, -40] });
+    
+    branches.forEach(b => {
+        L.marker([b.lat, b.lng], {icon: clinicIcon})
+            .addTo(map)
+            .bindPopup(`<b>${b.ten}</b><br>${b.dia_chi}`);
+    });
+
+
+    const listArea = document.getElementById('listArea');
+    
+    function render(data) {
+        listArea.innerHTML = "";
+        document.getElementById('count').innerText = data.length;
+
+        if(data.length === 0) {
+            listArea.innerHTML = "<div class='text-center mt-5 text-muted'>Không tìm thấy khách hàng nào</div>";
+            return;
+        }
+
+        data.forEach((item) => {
+            const el = document.createElement('div');
+            el.className = 'cus-card';
+            
+            
+            el.innerHTML = `
+                <div class="card-top">
+                    <div>
+                        <div class="c-name">${item.ten_khach}</div>
+                        <div class="small text-muted">Hồ sơ #${item.id}</div>
+                    </div>
+                    <span class="c-badge">Đã đặt lịch</span>
+                </div>
+                
+                <div class="c-row">
+                    <i class="fas fa-tooth text-info"></i>
+                    <span>${item.dich_vu}</span>
+                </div>
+                <div class="c-row">
+                    <i class="fas fa-map-marker-alt text-danger"></i>
+                    <span>Đến: <b>${item.ten_chi_nhanh}</b></span>
+                </div>
+
+                <button class="btn-go-map" onclick="runRoute(${item.lat}, ${item.lng}, '${item.ten_chi_nhanh}', '${item.ten_khach}')">
+                    <i class="fas fa-directions"></i> Xem Đường Đi
+                </button>
+            `;
+            
+            
+            el.addEventListener('click', (e) => {
+                if(e.target.tagName !== 'BUTTON' && e.target.tagName !== 'I') {
+                    map.flyTo([item.lat, item.lng], 15);
+                }
+            });
+            listArea.appendChild(el);
+        });
+    }
+    
+    
+    render(bookings);
+
+    
+    function filterList() {
+        const txt = document.getElementById('searchInp').value.toLowerCase();
+        const filtered = bookings.filter(b => 
+            b.ten_khach.toLowerCase().includes(txt) || 
+            b.sdt.includes(txt)
+        );
+        render(filtered);
+    }
+
+    // 5. CHỨC NĂNG DẪN ĐƯỜNG (ROUTING)
+    var routingControl = null;
+    var userMarker = null;
+
+    function runRoute(dLat, dLng, dName, cName) {
+        if(!navigator.geolocation) return alert("Vui lòng bật GPS trên thiết bị!");
+        
+        
+        if(routingControl) map.removeControl(routingControl);
+        if(userMarker) map.removeLayer(userMarker);
+
+        navigator.geolocation.getCurrentPosition(pos => {
+            const uLat = pos.coords.latitude;
+            const uLng = pos.coords.longitude;
+            
+            
+            var userIcon = L.icon({ iconUrl: 'https://cdn-icons-png.flaticon.com/512/9131/9131546.png', iconSize: [40, 40], iconAnchor: [20, 40] });
+
+            
+            userMarker = L.marker([uLat, uLng], {icon: userIcon}).addTo(map).bindPopup("Vị trí của bạn").openPopup();
+            
+            // Tuyến đường đi
+            routingControl = L.Routing.control({
+                waypoints: [L.latLng(uLat, uLng), L.latLng(dLat, dLng)],
+                lineOptions: { styles: [{color: '#0d6efd', opacity: 0.8, weight: 6}] },
+                createMarker: () => null, 
+                show: false, 
+                addWaypoints: false
+            }).addTo(map);
+
+            // Tính khoảng cách - thời gian khi tìm được lộ trình
+            routingControl.on('routesfound', e => {
+                const summary = e.routes[0].summary;
+                document.getElementById('rbName').innerText = cName;
+                document.getElementById('rbDist').innerText = (summary.totalDistance/1000).toFixed(2) + ' km';
+                document.getElementById('rbTime').innerText = Math.round(summary.totalTime/60) + ' phút';
+                document.getElementById('routeBar').classList.add('show');
+            });
+
+            // Zoom map bao quát lộ trình
+            map.fitBounds(L.latLngBounds([[uLat, uLng], [dLat, dLng]]), {padding:[50,50]});
+
+        }, () => alert("Không thể lấy vị trí GPS!"));
+    }
+
+    function closeRoute() {
+        document.getElementById('routeBar').classList.remove('show');
+        if(routingControl) map.removeControl(routingControl);
+        if(userMarker) map.removeLayer(userMarker);
+    }
+</script>
+{% endblock %}

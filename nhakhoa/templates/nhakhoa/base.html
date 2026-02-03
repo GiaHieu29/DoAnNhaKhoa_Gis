@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -6,110 +7,124 @@
 
     <title>{% block title %}Phòng khám nha khoa{% endblock %}</title>
 
-    {% load static %}
-    
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <link rel="stylesheet" href="{% static 'css/base.css' %}">
     <link rel="stylesheet" href="{% static 'css/popup.css' %}">
-    
-    <style>
-        /* Tùy chỉnh thêm cho Menu */
-        .navbar-brand span {
-            font-weight: 800; color: #0d6efd; font-size: 24px; letter-spacing: 1px;
-        }
-        .nav-link {
-            font-weight: 600; color: #333 !important; font-size: 15px; transition: 0.3s;
-        }
-        .nav-link:hover {
-            color: #0d6efd !important; transform: translateY(-2px);
-        }
-        .btn-book-nav {
-            background: linear-gradient(45deg, #0d6efd, #0099ff);
-            color: white; border: none; padding: 8px 25px;
-            border-radius: 50px; font-weight: bold; box-shadow: 0 4px 10px rgba(13, 110, 253, 0.3);
-            transition: 0.3s;
-        }
-        .btn-book-nav:hover {
-            transform: translateY(-2px); box-shadow: 0 6px 15px rgba(13, 110, 253, 0.4); color: white;
-        }
-    </style>
-</head>
+    <link rel="stylesheet" href="{% static 'css/header.css' %}">
+    <link rel="stylesheet" href="{% static 'css/footer.css' %}"> </head>
 
-<body>
+<body class="d-flex flex-column min-vh-100">
 
-<nav class="navbar navbar-expand-lg navbar-light bg-white sticky-top shadow-sm" style="padding: 15px 0;">
-    <div class="container">
-        
-        <a class="navbar-brand d-flex align-items-center" href="{% url 'index' %}">
-            <img src="https://cdn-icons-png.flaticon.com/512/190/190411.png" width="40" height="40" class="me-2" alt="Logo">
-            <span>NHA KHOA SMILE</span>
-        </a>
-
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-
-        <div class="collapse navbar-collapse" id="navbarNav">
-            
-            <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-4">
-                <li class="nav-item"><a class="nav-link px-3" href="{% url 'index' %}">Trang chủ</a></li>
-                <li class="nav-item"><a class="nav-link px-3" href="{% url 'gioithieu' %}">Giới thiệu</a></li>
-                <li class="nav-item"><a class="nav-link px-3" href="{% url 'dichvu' %}">Dịch vụ</a></li>
-                <li class="nav-item"><a class="nav-link px-3" href="{% url 'chinhanh' %}">Chi nhánh</a></li>
-                <li class="nav-item"><a class="nav-link px-3" href="{% url 'lienhe' %}">Liên hệ</a></li>
-            </ul>
-
-            <div class="d-flex align-items-center gap-3">
+    <header class="clinic-header">
+        <div class="clinic-header-inner">
+            <div class="left-group">
+                <a href="{% url 'index' %}" class="logo">
+                    <img src="https://cdn-icons-png.flaticon.com/512/190/190411.png" alt="Logo">
+                    <span>NHA KHOA SMILE</span>
+                </a>
+                <nav class="clinic-menu">
+                    <a href="{% url 'index' %}">Trang chủ</a>
+                    <a href="{% url 'gioithieu' %}">Giới thiệu</a>
+                    <a href="{% url 'dichvu' %}">Dịch vụ</a>
+                    <a href="{% url 'chinhanh' %}">Chi nhánh</a>
+                    <a href="{% url 'ban_do_so' %}">Bản đồ số</a>
+                    <a href="{% url 'lienhe' %}">Liên hệ</a>
+                </nav>
+            </div>
+            <div class="header-right">
                 {% if user.is_authenticated %}
-                    <div class="dropdown">
-                        <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown">
-                            <i class="fas fa-user-circle fa-lg me-2" style="color: #0d6efd;"></i>
-                            Chào, {{ user.username }}
-                        </a>
-                        <ul class="dropdown-menu dropdown-menu-end border-0 shadow" style="border-radius: 10px;">
-                            {% if user.is_staff %}
-                                <li><a class="dropdown-item py-2" href="/admin/"><i class="fas fa-cog me-2 text-primary"></i> Quản trị</a></li>
-                            {% endif %}
-                            <li><a class="dropdown-item py-2" href="{% url 'lich_su' %}"><i class="fas fa-history me-2 text-warning"></i> Lịch sử khám</a></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item py-2 text-danger" href="{% url 'dangxuat' %}"><i class="fas fa-sign-out-alt me-2"></i> Đăng xuất</a></li>
-                        </ul>
+                    <div class="user-welcome">
+                        <i class="fas fa-user-circle text-primary" style="font-size: 16px;"></i>
+                        <span>{{ user.username }}</span>
+                        <span style="color: #ccc;">|</span>
+                        {% if user.is_staff %}
+                            <a href="/admin/" class="text-primary text-decoration-none"><i class="fas fa-cog"></i></a>
+                        {% endif %}
+                        <a href="{% url 'lich_su' %}" class="text-warning text-decoration-none"><i class="fas fa-history"></i></a>
+                        <a href="{% url 'dangxuat' %}" class="text-danger text-decoration-none"><i class="fas fa-sign-out-alt"></i></a>
                     </div>
                 {% else %}
-                    <a href="{% url 'dangnhap' %}" class="text-decoration-none text-dark fw-bold me-2">Đăng nhập</a>
+                    <a href="{% url 'dangnhap' %}" style="font-size:14px; font-weight:600; text-decoration:none; color:#333;">Đăng nhập</a>
                 {% endif %}
-
-                <button onclick="openPopup()" class="btn-book-nav">Đặt lịch ngay</button>
+                <a href="#" onclick="openPopup()" class="btn-book">Đặt lịch ngay</a>
             </div>
         </div>
-    </div>
-</nav>
+    </header>
 
-<main>
-    {% block content %}{% endblock %}
-</main>
+    <main class="flex-grow-1">
+        {% block content %}{% endblock %}
+    </main>
 
-{% include "nhakhoa/components/popup.html" %}
+    <footer class="clinic-footer">
+        <div class="container">
+            <div class="row">
+                
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="footer-logo-box">
+                        <img src="https://cdn-icons-png.flaticon.com/512/190/190411.png" width="40" alt="Logo">
+                        <span class="footer-logo-text">Nha Khoa Smile</span>
+                    </div>
+                    <p class="footer-desc">
+                        Hệ thống nha khoa tiêu chuẩn quốc tế 5 sao. Chúng tôi cam kết mang lại nụ cười rạng rỡ và sức khỏe răng miệng hoàn hảo nhất cho cộng đồng Việt.
+                    </p>
+                    <div class="social-links">
+                        <a href="#" class="social-btn"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="social-btn"><i class="fab fa-youtube"></i></a>
+                        <a href="#" class="social-btn"><i class="fab fa-tiktok"></i></a>
+                        <a href="#" class="social-btn"><i class="fab fa-instagram"></i></a>
+                    </div>
+                </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+                <div class="col-lg-3 col-md-6 mb-4 ps-lg-5">
+                    <h5 class="footer-heading">Liên Kết Nhanh</h5>
+                    <ul class="footer-links">
+                        <li><a href="{% url 'index' %}"><i class="fas fa-chevron-right"></i> Trang chủ</a></li>
+                        <li><a href="{% url 'gioithieu' %}"><i class="fas fa-chevron-right"></i> Về chúng tôi</a></li>
+                        <li><a href="{% url 'dichvu' %}"><i class="fas fa-chevron-right"></i> Dịch vụ nha khoa</a></li>
+                        <li><a href="{% url 'chinhanh' %}"><i class="fas fa-chevron-right"></i> Hệ thống chi nhánh</a></li>
+                        <li><a href="{% url 'lienhe' %}"><i class="fas fa-chevron-right"></i> Liên hệ tư vấn</a></li>
+                    </ul>
+                </div>
 
-<script>
-    function openPopup() {
-        var popup = document.getElementById("popup");
-        if (popup) {
-            popup.style.display = "flex";
-        }
-    }
+                <div class="col-lg-5 col-md-12 mb-4">
+                    <h5 class="footer-heading">Thông Tin Liên Hệ</h5>
+                    
+                    <div class="contact-row">
+                        <div class="contact-icon-box"><i class="fas fa-map-marker-alt"></i></div>
+                        <div class="contact-text">
+                            <strong>Trụ sở chính:</strong>
+                            <span>123 Đường Nguyễn Huệ, Phường Bến Nghé, Quận 1, TP. Hồ Chí Minh</span>
+                        </div>
+                    </div>
 
-    function closePopup() {
-        var popup = document.getElementById("popup");
-        if (popup) {
-            popup.style.display = "none";
-        }
-    }
-</script>
+                    <div class="contact-row">
+                        <div class="contact-icon-box"><i class="fas fa-phone-volume"></i></div>
+                        <div class="contact-text">
+                            <strong>Hotline 24/7:</strong>
+                            <span style="font-size:16px; color:#fff; font-weight:bold;">0909.123.456</span>
+                        </div>
+                    </div>
 
+                    <div class="contact-row">
+                        <div class="contact-icon-box"><i class="fas fa-envelope-open-text"></i></div>
+                        <div class="contact-text">
+                            <strong>Email hỗ trợ:</strong>
+                            <span>nhakhoasmile@gmail.com</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </footer>
+    {% include "nhakhoa/components/popup.html" %}
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function openPopup() { document.getElementById("popup").style.display = "flex"; }
+        function closePopup() { document.getElementById("popup").style.display = "none"; }
+    </script>
 </body>
 </html>

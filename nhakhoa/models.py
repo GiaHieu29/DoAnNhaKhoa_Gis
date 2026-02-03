@@ -1,7 +1,8 @@
 from django.db import models
 from django.utils import timezone
 
-# 1. MODEL DỊCH VỤ (Giữ nguyên)
+
+# 1. MODEL DỊCH VỤ
 class DichVu(models.Model):
     ten_dich_vu = models.CharField(max_length=200, verbose_name="Tên dịch vụ")
     mo_ta = models.TextField(verbose_name="Mô tả ngắn")
@@ -10,28 +11,39 @@ class DichVu(models.Model):
 
     def __str__(self):
         return self.ten_dich_vu
+    
     class Meta:
         verbose_name = "Dịch vụ"
         verbose_name_plural = "1. Quản lý Dịch vụ"
 
-# 2. MODEL CHI NHÁNH (Đây là phần GIS - QUAN TRỌNG)
+# 2. MODEL CHI NHÁNH & GIS (Đã nâng cấp)
 class ChiNhanh(models.Model):
     ten_chi_nhanh = models.CharField(max_length=200, verbose_name="Tên chi nhánh")
     dia_chi = models.CharField(max_length=500, verbose_name="Địa chỉ hiển thị")
-    
+    so_dien_thoai = models.CharField(max_length=20, default="0909.xxx.xxx", verbose_name="Hotline")
+
     # --- TRƯỜNG DỮ LIỆU GIS (TỌA ĐỘ) ---
-    kinh_do = models.FloatField(verbose_name="Kinh độ (Longitude)")  # Ví dụ: 106.653...
-    vi_do = models.FloatField(verbose_name="Vĩ độ (Latitude)")       # Ví dụ: 10.790...
-    
-    link_google_map = models.TextField(verbose_name="Link Embed Map (Iframe)")
+    kinh_do = models.CharField(
+        max_length=50, 
+        verbose_name="Kinh độ (Longitude)",
+        help_text="Ví dụ: 106.660172 (Số thứ 2 khi click chuột phải trên Google Map)"
+    )
+    vi_do = models.CharField(
+        max_length=50, 
+        verbose_name="Vĩ độ (Latitude)",
+        help_text="Ví dụ: 10.762622 (Số thứ 1 khi click chuột phải trên Google Map)"
+    )
 
     def __str__(self):
         return self.ten_chi_nhanh
+    
     class Meta:
         verbose_name = "Chi nhánh (GIS)"
         verbose_name_plural = "2. Quản lý Chi nhánh & Tọa độ"
 
-# 3. MODEL LỊCH HẸN (Sửa lại để liên kết với Chi Nhánh)
+
+# 3. MODEL LỊCH HẸN
+
 class LichHen(models.Model):
     TRANG_THAI_CHOICES = [
         ('cho_xac_nhan', 'Chờ xác nhận'),
@@ -44,13 +56,14 @@ class LichHen(models.Model):
     so_dien_thoai = models.CharField(max_length=15, verbose_name="Số điện thoại")
     email = models.EmailField(verbose_name="Email", blank=True, null=True)
     
-    # Thay vì lưu text, ta liên kết khóa ngoại với bảng ChiNhanh để lấy tọa độ
+
     chi_nhanh = models.ForeignKey(ChiNhanh, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Chi nhánh đăng ký")
     
     dich_vu = models.ForeignKey(DichVu, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Dịch vụ quan tâm")
     ngay_hen_mong_muon = models.DateField(verbose_name="Ngày khách chọn", blank=True, null=True)
     noi_dung = models.TextField(blank=True, verbose_name="Ghi chú / Tình trạng")
     thoi_gian_tao = models.DateTimeField(auto_now_add=True, verbose_name="Thời gian gửi")
+    
     trang_thai = models.CharField(max_length=20, choices=TRANG_THAI_CHOICES, default='cho_xac_nhan', verbose_name="Trạng thái")
     tong_tien = models.DecimalField(max_digits=12, decimal_places=0, default=0, verbose_name="Thực thu (VNĐ)")
 

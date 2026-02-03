@@ -1,162 +1,154 @@
 {% extends 'nhakhoa/base.html' %}
 {% load static %}
 
-{% block title %}Đặt lịch thành công - Nha Khoa Smile{% endblock %}
+{% block title %}Xác nhận đặt lịch thành công{% endblock %}
 
 {% block content %}
-<div class="container" style="padding: 60px 20px; max-width: 900px;">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<style>
+    /* Card xác nhận chuyên nghiệp */
+    .confirmation-card {
+        max-width: 800px;
+        margin: 50px auto;
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        overflow: hidden;
+        border: 1px solid #eee;
+    }
     
-    <div style="text-align: center; margin-bottom: 40px;">
-        <img src="https://cdn-icons-png.flaticon.com/512/190/190411.png" style="width: 80px; margin-bottom: 20px;">
-        <h1 style="color: #28a745; font-weight: bold; text-transform: uppercase;">Đặt Lịch Hẹn Thành Công!</h1>
-        <p style="font-size: 18px; color: #666;">Cảm ơn <b>{{ lich_hen.ho_ten }}</b> đã tin tưởng. Chúng tôi đã nhận được yêu cầu của bạn.</p>
-    </div>
+    .card-header-success {
+        background: linear-gradient(135deg, #198754 0%, #20c997 100%);
+        color: white;
+        padding: 40px 20px;
+        text-align: center;
+    }
+    
+    .icon-box {
+        width: 80px; height: 80px;
+        background: white;
+        color: #198754;
+        border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 40px;
+        margin: 0 auto 20px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+    
+    .info-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 12px 0;
+        border-bottom: 1px dashed #eee;
+    }
+    .info-row:last-child { border-bottom: none; }
+    .label-text { color: #666; font-weight: 500; }
+    .value-text { font-weight: 700; color: #333; }
+    
+    /* Map xác nhận */
+    #confirm-map {
+        width: 100%;
+        height: 250px;
+        border-radius: 12px;
+        margin-top: 20px;
+        border: 1px solid #ddd;
+    }
+</style>
 
-    <div class="row" style="display: flex; flex-wrap: wrap; gap: 30px;">
-        
-        <div style="flex: 1; min-width: 300px; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.05); border: 1px solid #eee;">
-            <h3 style="color: #0d6efd; margin-bottom: 20px; border-bottom: 2px solid #f0f0f0; padding-bottom: 10px;">
-                📄 Phiếu xác nhận
-            </h3>
-            
-            <style>
-                .info-row { margin-bottom: 15px; display: flex; justify-content: space-between; }
-                .info-label { color: #888; font-weight: 500; }
-                .info-val { font-weight: bold; color: #333; }
-                .btn-routing {
-                    background: linear-gradient(45deg, #FF512F, #DD2476);
-                    color: white; border: none; padding: 10px 20px;
-                    border-radius: 50px; font-weight: bold; cursor: pointer;
-                    width: 100%; margin-top: 10px; transition: 0.3s;
-                    box-shadow: 0 4px 15px rgba(221, 36, 118, 0.3);
-                }
-                .btn-routing:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(221, 36, 118, 0.4); }
-                .distance-result {
-                    display: none; background: #e3f2fd; color: #0d6efd;
-                    padding: 10px; border-radius: 8px; margin-top: 15px;
-                    text-align: center; border: 1px dashed #0d6efd;
-                }
-            </style>
-
-            <div class="info-row">
-                <span class="info-label">Mã phiếu:</span>
-                <span class="info-val">#{{ lich_hen.id }}</span>
+<div class="container py-5">
+    <div class="confirmation-card">
+        <div class="card-header-success">
+            <div class="icon-box">
+                <i class="fas fa-check"></i>
             </div>
-            <div class="info-row">
-                <span class="info-label">Khách hàng:</span>
-                <span class="info-val">{{ lich_hen.ho_ten }}</span>
-            </div>
-            <div class="info-row">
-                <span class="info-label">Số điện thoại:</span>
-                <span class="info-val">{{ lich_hen.so_dien_thoai }}</span>
-            </div>
-            <div class="info-row">
-                <span class="info-label">Dịch vụ:</span>
-                <span class="info-val" style="color: #d63384;">{{ lich_hen.dich_vu.ten_dich_vu|default:"Chưa chọn" }}</span>
-            </div>
-            <div class="info-row">
-                <span class="info-label">Ngày hẹn:</span>
-                <span class="info-val">{{ lich_hen.ngay_hen_mong_muon|date:"d/m/Y"|default:"Sẽ sắp xếp sau" }}</span>
-            </div>
-            <div class="info-row">
-                <span class="info-label">Chi nhánh:</span>
-                <span class="info-val">{{ lich_hen.chi_nhanh.ten_chi_nhanh }}</span>
-            </div>
-
-            <div style="margin-top: 30px; text-align: center;">
-                <a href="{% url 'index' %}" style="color: #666; text-decoration: none;">← Về trang chủ</a>
-            </div>
+            <h2 class="fw-bold">ĐẶT LỊCH THÀNH CÔNG!</h2>
+            <p class="mb-0 opacity-75">Cảm ơn bạn đã tin tưởng Nha Khoa Smile</p>
         </div>
 
-        <div style="flex: 1; min-width: 300px;">
-            <h3 style="color: #0d6efd; margin-bottom: 20px;">📍 Vị trí trên bản đồ (GIS)</h3>
-            <p style="margin-bottom: 10px; font-size: 14px; color: #555;">
-                <i class="fas fa-map-marker-alt" style="color: red;"></i> Địa chỉ: <b>{{ address }}</b>
-            </p>
-            
-            <div style="width: 100%; height: 250px; border-radius: 15px; overflow: hidden; box-shadow: 0 5px 20px rgba(0,0,0,0.1);">
-                {% if map_url %}
-                    <iframe src="{{ map_url }}" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
-                {% else %}
-                    <div style="width: 100%; height: 100%; background: #eee; display: flex; align-items: center; justify-content: center; color: #999;">
-                        Chưa cập nhật bản đồ
-                    </div>
-                {% endif %}
+        <div class="row g-0">
+            <div class="col-md-7 p-4 border-end">
+                <h5 class="fw-bold text-success mb-3"><i class="fas fa-info-circle me-2"></i>Thông tin phiếu khám</h5>
+                
+                <div class="info-row">
+                    <span class="label-text">Mã hồ sơ:</span>
+                    <span class="value-text text-danger">#{{ lich_hen.id }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="label-text">Họ tên:</span>
+                    <span class="value-text">{{ lich_hen.ho_ten }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="label-text">Số điện thoại:</span>
+                    <span class="value-text">{{ lich_hen.so_dien_thoai }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="label-text">Dịch vụ:</span>
+                    <span class="value-text">{{ lich_hen.dich_vu.ten_dich_vu|default:"Khám tổng quát" }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="label-text">Ngày hẹn:</span>
+                    <span class="value-text text-primary">{{ lich_hen.ngay_hen_mong_muon|date:"d/m/Y" }}</span>
+                </div>
+                
+                <div class="mt-4 d-flex gap-2">
+                    <a href="{% url 'index' %}" class="btn btn-outline-secondary flex-grow-1">Về trang chủ</a>
+                    <a href="{% url 'lich_su' %}" class="btn btn-success flex-grow-1">Xem lịch sử</a>
+                </div>
             </div>
 
-            <div style="margin-top: 20px;">
-                <button onclick="batDauTinhToanGIS()" class="btn-routing">
-                    <i class="fas fa-route"></i> Tính khoảng cách & Dẫn đường
-                </button>
+            <div class="col-md-5 p-4 bg-light">
+                <h5 class="fw-bold text-primary mb-3"><i class="fas fa-map-marker-alt me-2"></i>Địa điểm khám</h5>
                 
-                <div id="status-gis" style="margin-top: 10px; font-size: 13px; color: #888; text-align: center; font-style: italic;">
-                    Dữ liệu GIS đầu vào: GPS của bạn & Database
+                <div class="mb-2">
+                    <strong class="d-block text-dark">{{ lich_hen.chi_nhanh.ten_chi_nhanh }}</strong>
+                    <small class="text-muted">{{ address }}</small>
                 </div>
 
-                <div id="ket-qua-gis" class="distance-result">
-                    </div>
+                <div id="confirm-map"></div>
+                
+                <div class="mt-3 d-grid">
+                    <a href="{% url 'ban_do_so' %}?lat={{ lat }}&lng={{ lng }}" class="btn btn-primary fw-bold py-2 shadow-sm">
+                        <i class="fas fa-directions me-2"></i> XEM ĐƯỜNG ĐI ĐẾN ĐÂY
+                    </a>
+                </div>
+                
+                <div class="text-center mt-3">
+                    <small class="text-muted fst-italic">* Vui lòng đến trước 10 phút để làm thủ tục</small>
+                </div>
             </div>
-
-            <div style="text-align: right; margin-top: 10px; font-size: 12px; color: #aaa;">
-                Lat: {{ lat|stringformat:"f" }} | Lng: {{ lng|stringformat:"f" }}
-            </div>
-
         </div>
     </div>
 </div>
 
 <script>
-    function tinhKhoangCach(lat1, lon1, lat2, lon2) {
-        const R = 6371; // Bán kính trái đất (km)
-        const dLat = (lat2 - lat1) * Math.PI / 180;
-        const dLon = (lon2 - lon1) * Math.PI / 180;
-        const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-                  Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon/2) * Math.sin(dLon/2);
-        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-        return (R * c).toFixed(2);
-    }
+    // Script vẽ bản đồ xác nhận
+    document.addEventListener("DOMContentLoaded", function() {
+        // 1. Bọc trong ngoặc kép "" để VS Code không báo lỗi cú pháp
+        // Dùng parseFloat để chuyển chuỗi đó thành số cho bản đồ hiểu
+        var lat = parseFloat("{{ lat|default:'0' }}");
+        var lng = parseFloat("{{ lng|default:'0' }}");
+        
+        // 2. Lấy tên chi nhánh (dùng escapejs để xử lý ký tự đặc biệt nếu có)
+        var tenChiNhanh = "{{ lich_hen.chi_nhanh.ten_chi_nhanh|escapejs }}";
 
-    function batDauTinhToanGIS() {
-        const statusDiv = document.getElementById("status-gis");
-        const resultBox = document.getElementById("ket-qua-gis");
-
-        if (!navigator.geolocation) {
-            alert("Trình duyệt không hỗ trợ GPS!");
-            return;
+        // Kiểm tra điều kiện (dùng !== thay cho != để chuẩn code JS)
+        if (lat !== 0 && lng !== 0) {
+            var map = L.map('confirm-map').setView([lat, lng], 16);
+            
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap'
+            }).addTo(map);
+            
+            L.marker([lat, lng]).addTo(map)
+                // 3. Nối chuỗi biến tên chi nhánh vào popup
+                .bindPopup("<b>" + tenChiNhanh + "</b><br>Hẹn gặp bạn tại đây!")
+                .openPopup();
+        } else {
+            document.getElementById('confirm-map').innerHTML = 
+                '<div class="d-flex align-items-center justify-content-center h-100 text-muted">Chưa có dữ liệu bản đồ</div>';
         }
-
-        statusDiv.innerHTML = "📡 Đang lấy tọa độ vệ tinh...";
-
-        navigator.geolocation.getCurrentPosition(
-            (position) => {
-                // 1. Lấy tọa độ User (GPS)
-                const userLat = position.coords.latitude;
-                const userLng = position.coords.longitude;
-
-                // 2. Lấy tọa độ Chi nhánh 
-                const clinicLat = parseFloat("{{ lat|stringformat:'f' }}");
-                const clinicLng = parseFloat("{{ lng|stringformat:'f' }}");
-
-                // 3. Tính khoảng cách
-                const distance = tinhKhoangCach(userLat, userLng, clinicLat, clinicLng);
-
-                // 4. Hiển thị kết quả & Link dẫn đường chuẩn
-                resultBox.style.display = "block";
-                resultBox.innerHTML = `
-                    <div style="font-size: 18px; font-weight: bold;">Khoảng cách: ${distance} km</div>
-                    <a href="https://www.google.com/maps/dir/?api=1&destination=${clinicLat},${clinicLng}" 
-                       target="_blank" 
-                       style="display: block; margin-top: 5px; text-decoration: underline; color: #0d6efd;">
-                       🚀 Bấm để mở bản đồ dẫn đường
-                    </a>
-                `;
-                statusDiv.innerHTML = "✅ Tính toán hoàn tất!";
-            },
-            () => {
-                statusDiv.innerHTML = "❌ Không lấy được vị trí. Hãy bật GPS!";
-                statusDiv.style.color = "red";
-            }
-        );
-    }
+    });
 </script>
 {% endblock %}

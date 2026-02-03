@@ -1,0 +1,73 @@
+/* CSS DANH SÁCH CHI NHÁNH */
+.branch-item {
+    background: #fff;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+    margin-bottom: 30px;
+    border: 1px solid #f0f0f0;
+    transition: 0.3s;
+    height: 100%;
+    display: flex; flex-direction: column;
+}
+.branch-item:hover { transform: translateY(-5px); box-shadow: 0 15px 30px rgba(0,0,0,0.1); border-color: #0d6efd; }
+
+.mini-map-preview {
+    width: 100%; height: 200px; background: #eee;
+    position: relative;
+}
+
+/* Lớp phủ mờ trên map nhỏ */
+.map-overlay {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.1);
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0; transition: 0.3s; cursor: pointer; z-index: 999;
+}
+.mini-map-preview:hover .map-overlay { opacity: 1; }
+.btn-preview { background: white; padding: 10px 20px; border-radius: 30px; font-weight: bold; box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+
+.branch-info { padding: 25px; flex-grow: 1; display: flex; flex-direction: column; }
+.branch-title { color: #0d6efd; font-weight: 800; font-size: 18px; margin-bottom: 15px; }
+.info-line { display: flex; gap: 10px; margin-bottom: 10px; color: #555; font-size: 14px; }
+.info-line i { color: #0d6efd; margin-top: 3px; }
+
+.btn-route-big {
+    margin-top: auto; width: 100%; padding: 12px;
+    background: #0d6efd; color: white; border: none; border-radius: 8px;
+    font-weight: 700; transition: 0.2s; cursor: pointer;
+}
+.btn-route-big:hover { background: #0b5ed7; }
+
+/* --- CSS CHO POPUP BẢN ĐỒ TO (MODAL) --- */
+.map-modal-overlay {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.8);
+    z-index: 9999;
+    display: none;
+    align-items: center; justify-content: center;
+    animation: fadeIn 0.3s;
+}
+
+.map-modal-content {
+    width: 90%; height: 90%;
+    background: white;
+    border-radius: 15px;
+    overflow: hidden;
+    position: relative;
+    display: flex; flex-direction: column;
+}
+
+.map-modal-header {
+    padding: 15px 20px; background: white; border-bottom: 1px solid #eee;
+    display: flex; justify-content: space-between; align-items: center;
+}
+.btn-close-map {
+    background: #f8f9fa; border: none; font-size: 20px; width: 40px; height: 40px;
+    border-radius: 50%; cursor: pointer; transition: 0.2s;
+}
+.btn-close-map:hover { background: #e9ecef; color: red; }
+
+#big-map-container { width: 100%; flex-grow: 1; }
+
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }

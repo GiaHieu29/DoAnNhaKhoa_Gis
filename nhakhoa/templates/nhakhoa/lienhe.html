@@ -5,8 +5,35 @@
 
 {% block content %}
 
-<section class="sub-banner" style="background-image: url('{% static "images/lienhe.jpg" %}'); height: 350px; background-size: cover; background-position: center; position: relative; display: flex; align-items: center; justify-content: center;">
-    <div class="overlay" style="background: rgba(0,0,0,0.6); position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; color: white;">
+<style>
+
+    .sub-banner {
+        background-image: url('{% static "images/lienhe.jpg" %}');
+        height: 350px;
+        background-size: cover;
+        background-position: center;
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+
+    .overlay {
+        background: rgba(0,0,0,0.6);
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        color: white;
+    }
+</style>
+
+<section class="sub-banner">
+    <div class="overlay">
         <h1 style="font-size: 42px; font-weight: bold; margin-bottom: 10px; text-transform: uppercase;">Liên Hệ & Hỗ Trợ</h1>
         <p style="font-size: 18px;">Chúng tôi luôn sẵn sàng lắng nghe và giải đáp mọi thắc mắc của bạn</p>
     </div>
