@@ -1,0 +1,142 @@
+{% extends 'nhakhoa/base.html' %}
+{% load static %}
+
+{% block title %}Liên hệ & Hỗ trợ - Nha Khoa Smile{% endblock %}
+
+{% block content %}
+
+<style>
+
+    .sub-banner {
+        background-image: url('{% static "images/lienhe.jpg" %}');
+        height: 350px;
+        background-size: cover;
+        background-position: center;
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+
+    .overlay {
+        background: rgba(0,0,0,0.6);
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        color: white;
+    }
+</style>
+
+<section class="sub-banner">
+    <div class="overlay">
+        <h1 style="font-size: 42px; font-weight: bold; margin-bottom: 10px; text-transform: uppercase;">Liên Hệ & Hỗ Trợ</h1>
+        <p style="font-size: 18px;">Chúng tôi luôn sẵn sàng lắng nghe và giải đáp mọi thắc mắc của bạn</p>
+    </div>
+</section>
+
+<div class="container" style="padding: 80px 20px;">
+    <div class="contact-grid">
+        
+        <div class="contact-info">
+            <h2 style="text-align: left; margin-bottom: 20px;">Thông tin liên hệ</h2>
+            <p style="margin-bottom: 30px; color: #666;">Hãy ghé thăm phòng khám hoặc liên hệ với chúng tôi qua các kênh dưới đây.</p>
+
+            <div class="info-box">
+                <div class="icon">📍</div>
+                <div class="details">
+                    <h3>Trụ sở chính</h3>
+                    <p>123 Nguyễn Huệ, Phường Bến Nghé, Quận 1, TP.HCM</p>
+                </div>
+            </div>
+
+            <div class="info-box">
+                <div class="icon">☎️</div>
+                <div class="details">
+                    <h3>Hotline 24/7</h3>
+                    <p class="highlight">1900 1234</p>
+                    <p style="font-size: 13px; color: #888;">(Hỗ trợ Zalo, Viber)</p>
+                </div>
+            </div>
+
+            <div class="info-box">
+                <div class="icon">📧</div>
+                <div class="details">
+                    <h3>Email hỗ trợ</h3>
+                    <p>cskh@nhakhoasmile.com</p>
+                </div>
+            </div>
+
+            <div class="info-box working-hours">
+                <div class="icon">⏰</div>
+                <div class="details">
+                    <h3>Giờ làm việc</h3>
+                    <p>Thứ 2 - Thứ 7: <strong>8:00 - 20:00</strong></p>
+                    <p>Chủ nhật: <strong>8:00 - 17:00</strong></p>
+                </div>
+            </div>
+        </div>
+
+        <div class="contact-form-wrapper">
+            <h3 style="text-align: center; color: #0d6efd; margin-bottom: 20px; font-weight: 700;">Gửi thắc mắc cho chúng tôi</h3>
+            <form action="#" method="POST">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label>Họ và tên</label>
+                    <input type="text" placeholder="Nhập tên của bạn..." required>
+                </div>
+                <div class="form-group">
+                    <label>Số điện thoại</label>
+                    <input type="tel" placeholder="Nhập số điện thoại..." required>
+                </div>
+                <div class="form-group">
+                    <label>Nội dung cần hỗ trợ</label>
+                    <textarea rows="4" placeholder="Bạn cần tư vấn vấn đề gì?"></textarea>
+                </div>
+                <button type="submit" class="btn-submit">Gửi thông tin ngay</button>
+            </form>
+        </div>
+
+    </div>
+</div>
+
+<section class="customer-care">
+    <div class="container">
+        <h2 style="margin-bottom: 50px;">Trung tâm Chăm sóc Khách hàng</h2>
+        
+        <div class="care-grid">
+            <div class="care-card">
+                <div class="care-icon">🛡️</div>
+                <h3>Chính sách bảo hành</h3>
+                <p>Cam kết bảo hành trọn đời cho răng sứ và Implant. Minh bạch, rõ ràng trong mọi điều khoản.</p>
+                <a href="#">Xem chi tiết &rarr;</a>
+            </div>
+
+            <div class="care-card">
+                <div class="care-icon">📅</div>
+                <h3>Hướng dẫn đặt lịch</h3>
+                <p>Đặt lịch hẹn online dễ dàng qua Website hoặc Hotline để không phải chờ đợi khi đến khám.</p>
+                <a href="#">Đặt lịch ngay &rarr;</a>
+            </div>
+
+            <div class="care-card">
+                <div class="care-icon">💬</div>
+                <h3>Tư vấn trực tuyến</h3>
+                <p>Đội ngũ bác sĩ sẵn sàng giải đáp thắc mắc của bạn qua Zalo/Facebook 24/7 hoàn toàn miễn phí.</p>
+                <a href="#">Chat ngay &rarr;</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="map-section">
+    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3919.424169455328!2d106.69842731533423!3d10.774439262100863!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31752f385570472f%3A0x1787491df6ed1d64!2zTmh1IFBow6ogcXVhbiwgQuG6v24gTmdow6ksIFF14bqtbiAxLCBUaMOgbmggcGjhu5EgSOG7kyBDaMOtaSBNaW5oLCBWaWV0bmFt!5e0!3m2!1sen!2s!4v1646725841234!5m2!1sen!2s" 
+        width="100%" height="450" style="border:0;" allowfullscreen="" loading="lazy">
+    </iframe>
+</div>
+
+{% endblock %}

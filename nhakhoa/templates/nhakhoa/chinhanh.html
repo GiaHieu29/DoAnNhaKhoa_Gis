@@ -1,0 +1,157 @@
+{% extends 'nhakhoa/base.html' %}
+{% load static %}
+
+{% block title %}Hệ thống Chi nhánh - Nha Khoa Smile{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.css" />
+<script src="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.js"></script>
+
+<link rel="stylesheet" href="{% static 'css/chinhanh.css' %}">
+
+<div class="container py-5">
+    <div class="text-center mb-5">
+        <h2 class="fw-bold text-uppercase">Hệ Thống Chi Nhánh</h2>
+        <p class="text-muted">Chọn chi nhánh để xem chỉ đường chi tiết</p>
+    </div>
+
+    <div class="row g-4">
+        {% for cn in ds_cn %}
+        <div class="col-md-6 col-lg-4">
+            <div class="branch-item">
+                <div class="mini-map-preview" id="preview-{{ cn.id }}">
+                    <div class="map-overlay" onclick="moBanDoTo('{{ cn.ten_chi_nhanh }}', '{{ cn.vi_do }}', '{{ cn.kinh_do }}')">
+                        <span class="btn-preview"><i class="fas fa-expand-arrows-alt me-2"></i>Phóng to</span>
+                    </div>
+                </div>
+
+                <div class="branch-info">
+                    <h3 class="branch-title">{{ cn.ten_chi_nhanh }}</h3>
+                    <div class="info-line"><i class="fas fa-map-marker-alt"></i><span>{{ cn.dia_chi }}</span></div>
+                    <div class="info-line"><i class="fas fa-phone-alt"></i><span>{{ cn.so_dien_thoai }}</span></div>
+                    
+                    <button class="btn-route-big" onclick="moBanDoTo('{{ cn.ten_chi_nhanh }}', '{{ cn.vi_do }}', '{{ cn.kinh_do }}')">
+                        <i class="fas fa-location-arrow me-2"></i> Xem đường đi
+                    </button>
+                </div>
+            </div>
+            
+            <script>
+                (function() {
+                    var lat = parseFloat("{{ cn.vi_do|default:'0' }}");
+                    var lng = parseFloat("{{ cn.kinh_do|default:'0' }}");
+
+                    if (lat !== 0 && lng !== 0) {
+                        var mapId = "preview-{{ cn.id }}";
+                        var map = L.map(mapId, {
+                            center: [lat, lng],
+                            zoom: 14,
+                            zoomControl: false,
+                            scrollWheelZoom: false,
+                            dragging: false
+                        });
+
+                        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+                        L.marker([lat, lng]).addTo(map);
+                    }
+                })();
+            </script>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<div class="map-modal-overlay" id="mapModal">
+    <div class="map-modal-content">
+        <div class="map-modal-header">
+            <div>
+                <h5 class="fw-bold mb-0" id="modalTitle">Đang tìm đường...</h5>
+                <small class="text-muted" id="modalStatus">Vui lòng chờ lấy vị trí của bạn</small>
+            </div>
+            <button class="btn-close-map" onclick="dongBanDoTo()"><i class="fas fa-times"></i></button>
+        </div>
+
+        <div id="big-map-container"></div>
+    </div>
+</div>
+
+<script>
+    var bigMap = null;
+    var routingControl = null;
+
+    function moBanDoTo(tenChiNhanh, destLat, destLng) {
+        var modal = document.getElementById('mapModal');
+        modal.style.display = 'flex';
+        document.getElementById('modalTitle').innerText = "Dẫn đường đến: " + tenChiNhanh;
+        document.getElementById('modalStatus').innerText = "Đang lấy vị trí GPS của bạn...";
+        destLat = parseFloat(destLat);
+        destLng = parseFloat(destLng);
+
+        if (!bigMap) {
+            bigMap = L.map('big-map-container').setView([destLat, destLng], 13);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap'
+            }).addTo(bigMap);
+        } else {
+            setTimeout(function(){ bigMap.invalidateSize(); }, 100);
+        }
+
+        // Lấy vị trí người dùng & Vẽ đường
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(function(position) {
+                var userLat = position.coords.latitude;
+                var userLng = position.coords.longitude;
+                
+                document.getElementById('modalStatus').innerText = "Đã tìm thấy vị trí của bạn! Đang vẽ đường...";
+                document.getElementById('modalStatus').classList.add('text-success');
+
+                if (routingControl) {
+                    bigMap.removeControl(routingControl);
+                }
+
+                // Vẽ đường đi
+                routingControl = L.Routing.control({
+                    waypoints: [
+                        L.latLng(userLat, userLng),   // Điểm đi
+                        L.latLng(destLat, destLng)    // Điểm đến
+                    ],
+                    lineOptions: { styles: [{color: '#0d6efd', opacity: 0.8, weight: 6}] },
+                    createMarker: function(i, wp, nWps) {
+                        if (i === 0) {
+                            return L.marker(wp.latLng, {
+                                icon: L.icon({
+                                    iconUrl: 'https://cdn-icons-png.flaticon.com/512/6676/6676632.png',
+                                    iconSize: [30, 30], iconAnchor: [15, 30]
+                                })
+                            }).bindPopup("Bạn ở đây");
+                        } else if (i === nWps - 1) {
+                            return L.marker(wp.latLng).bindPopup(tenChiNhanh);
+                        }
+                    },
+                    addWaypoints: false,
+                    draggableWaypoints: false,
+                    fitSelectedRoutes: true,
+                    show: false
+                }).addTo(bigMap);
+
+            }, function(error) {
+                alert("Không thể lấy vị trí. Vui lòng bật GPS.");
+                document.getElementById('modalStatus').innerText = "Lỗi: Không tìm thấy GPS";
+            });
+        } else {
+            alert("Trình duyệt không hỗ trợ GPS.");
+        }
+    }
+
+    function dongBanDoTo() {
+        document.getElementById('mapModal').style.display = 'none';
+        if (routingControl && bigMap) {
+            bigMap.removeControl(routingControl);
+            routingControl = null;
+        }
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,102 @@
+/* ===== POPUP OVERLAY ===== */
+.popup-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 2000;
+    justify-content: center;
+    align-items: center;
+}
+
+/* ===== POPUP BOX ===== */
+.popup-box {
+    background: white;
+    width: 420px;
+    border-radius: 10px;
+    overflow: hidden;
+    animation: fadeIn 0.3s ease;
+}
+
+/* ===== HEADER ===== */
+.popup-header {
+    background: #0d6efd;
+    color: white;
+    padding: 16px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.popup-header h2 {
+    margin: 0;
+    font-size: 18px;
+}
+
+.close-btn {
+    font-size: 24px;
+    cursor: pointer;
+}
+
+/* ===== FORM ===== */
+.booking-form {
+    padding: 20px;
+}
+
+.form-group {
+    margin-bottom: 14px;
+}
+
+.form-group label {
+    display: block;
+    font-size: 14px;
+    margin-bottom: 6px;
+    font-weight: 500;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 9px 12px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: #0d6efd;
+}
+
+/* ===== BUTTON ===== */
+.submit-btn {
+    width: 100%;
+    background: #0d6efd;
+    color: white;
+    border: none;
+    padding: 11px;
+    border-radius: 6px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+.submit-btn:hover {
+    background: #0b5ed7;
+}
+
+/* ===== ANIMATION ===== */
+@keyframes fadeIn {
+    from {
+        transform: scale(0.95);
+        opacity: 0;
+    }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}

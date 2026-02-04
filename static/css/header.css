@@ -1,0 +1,100 @@
+/* --- FILE: static/css/header.css --- */
+
+/* ===== HEADER ===== */
+.clinic-header {
+    background: #ffffff;
+    border-bottom: 1px solid #e6e6e6;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    font-family: 'Segoe UI', Roboto, sans-serif;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.03); /* Thêm bóng mờ nhẹ cho sang */
+}
+
+.clinic-header-inner {
+    max-width: 1200px;
+    margin: auto;
+    padding: 10px 24px; /* Đã giảm từ 16px xuống 10px cho nhỏ gọn */
+    display: flex;
+    justify-content: space-between; /* Đẩy 2 nhóm sang 2 bên */
+    align-items: center;
+}
+
+/* ===== LEFT GROUP (Logo + Menu) ===== */
+.left-group {
+    display: flex;
+    align-items: center;
+    gap: 40px; /* Khoảng cách giữa Logo và Menu */
+}
+
+/* ===== LOGO ===== */
+.logo {
+    font-size: 20px; /* Giảm nhẹ font cho gọn */
+    font-weight: 800;
+    color: #0d6efd;
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
+    text-decoration: none;
+}
+
+.logo span { margin-left: 8px; }
+.logo img { height: 32px; width: auto; } /* Định kích thước ảnh logo */
+
+/* ===== MENU ===== */
+.clinic-menu {
+    display: flex;
+    gap: 25px;
+}
+
+.clinic-menu a {
+    text-decoration: none;
+    color: #444;
+    font-weight: 600;
+    font-size: 14px;
+    position: relative;
+    padding: 10px 0; /* Tăng vùng bấm */
+    transition: 0.3s;
+}
+
+.clinic-menu a:hover { color: #0d6efd; }
+
+/* Hiệu ứng gạch chân chạy ra */
+.clinic-menu a::after {
+    content: ""; position: absolute; bottom: 0; left: 0;
+    width: 0; height: 2px; background: #0d6efd; transition: 0.25s;
+}
+.clinic-menu a:hover::after { width: 100%; }
+
+/* ===== RIGHT GROUP (User + Button) ===== */
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.user-welcome {
+    font-size: 13px; font-weight: 600; color: #333;
+    display: flex; align-items: center; gap: 6px;
+}
+
+/* ===== BUTTON ===== */
+.btn-book {
+    background: #0d6efd;
+    color: white;
+    border: none;
+    padding: 8px 20px; /* Nút gọn hơn */
+    border-radius: 50px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: 0.3s;
+    text-decoration: none;
+    box-shadow: 0 4px 10px rgba(13, 110, 253, 0.2);
+}
+
+.btn-book:hover {
+    background: #0b5ed7;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 15px rgba(13, 110, 253, 0.3);
+}

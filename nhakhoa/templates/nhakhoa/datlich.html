@@ -1,0 +1,154 @@
+{% extends 'nhakhoa/base.html' %}
+{% load static %}
+
+{% block title %}Xác nhận đặt lịch thành công{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<style>
+    /* Card xác nhận chuyên nghiệp */
+    .confirmation-card {
+        max-width: 800px;
+        margin: 50px auto;
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        overflow: hidden;
+        border: 1px solid #eee;
+    }
+    
+    .card-header-success {
+        background: linear-gradient(135deg, #198754 0%, #20c997 100%);
+        color: white;
+        padding: 40px 20px;
+        text-align: center;
+    }
+    
+    .icon-box {
+        width: 80px; height: 80px;
+        background: white;
+        color: #198754;
+        border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 40px;
+        margin: 0 auto 20px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+    
+    .info-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 12px 0;
+        border-bottom: 1px dashed #eee;
+    }
+    .info-row:last-child { border-bottom: none; }
+    .label-text { color: #666; font-weight: 500; }
+    .value-text { font-weight: 700; color: #333; }
+    
+    /* Map xác nhận */
+    #confirm-map {
+        width: 100%;
+        height: 250px;
+        border-radius: 12px;
+        margin-top: 20px;
+        border: 1px solid #ddd;
+    }
+</style>
+
+<div class="container py-5">
+    <div class="confirmation-card">
+        <div class="card-header-success">
+            <div class="icon-box">
+                <i class="fas fa-check"></i>
+            </div>
+            <h2 class="fw-bold">ĐẶT LỊCH THÀNH CÔNG!</h2>
+            <p class="mb-0 opacity-75">Cảm ơn bạn đã tin tưởng Nha Khoa Smile</p>
+        </div>
+
+        <div class="row g-0">
+            <div class="col-md-7 p-4 border-end">
+                <h5 class="fw-bold text-success mb-3"><i class="fas fa-info-circle me-2"></i>Thông tin phiếu khám</h5>
+                
+                <div class="info-row">
+                    <span class="label-text">Mã hồ sơ:</span>
+                    <span class="value-text text-danger">#{{ lich_hen.id }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="label-text">Họ tên:</span>
+                    <span class="value-text">{{ lich_hen.ho_ten }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="label-text">Số điện thoại:</span>
+                    <span class="value-text">{{ lich_hen.so_dien_thoai }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="label-text">Dịch vụ:</span>
+                    <span class="value-text">{{ lich_hen.dich_vu.ten_dich_vu|default:"Khám tổng quát" }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="label-text">Ngày hẹn:</span>
+                    <span class="value-text text-primary">{{ lich_hen.ngay_hen_mong_muon|date:"d/m/Y" }}</span>
+                </div>
+                
+                <div class="mt-4 d-flex gap-2">
+                    <a href="{% url 'index' %}" class="btn btn-outline-secondary flex-grow-1">Về trang chủ</a>
+                    <a href="{% url 'lich_su' %}" class="btn btn-success flex-grow-1">Xem lịch sử</a>
+                </div>
+            </div>
+
+            <div class="col-md-5 p-4 bg-light">
+                <h5 class="fw-bold text-primary mb-3"><i class="fas fa-map-marker-alt me-2"></i>Địa điểm khám</h5>
+                
+                <div class="mb-2">
+                    <strong class="d-block text-dark">{{ lich_hen.chi_nhanh.ten_chi_nhanh }}</strong>
+                    <small class="text-muted">{{ address }}</small>
+                </div>
+
+                <div id="confirm-map"></div>
+                
+                <div class="mt-3 d-grid">
+                    <a href="{% url 'ban_do_so' %}?lat={{ lat }}&lng={{ lng }}" class="btn btn-primary fw-bold py-2 shadow-sm">
+                        <i class="fas fa-directions me-2"></i> XEM ĐƯỜNG ĐI ĐẾN ĐÂY
+                    </a>
+                </div>
+                
+                <div class="text-center mt-3">
+                    <small class="text-muted fst-italic">* Vui lòng đến trước 10 phút để làm thủ tục</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Script vẽ bản đồ xác nhận
+    document.addEventListener("DOMContentLoaded", function() {
+        // 1. Bọc trong ngoặc kép "" để VS Code không báo lỗi cú pháp
+        // Dùng parseFloat để chuyển chuỗi đó thành số cho bản đồ hiểu
+        var lat = parseFloat("{{ lat|default:'0' }}");
+        var lng = parseFloat("{{ lng|default:'0' }}");
+        
+        // 2. Lấy tên chi nhánh (dùng escapejs để xử lý ký tự đặc biệt nếu có)
+        var tenChiNhanh = "{{ lich_hen.chi_nhanh.ten_chi_nhanh|escapejs }}";
+
+        // Kiểm tra điều kiện (dùng !== thay cho != để chuẩn code JS)
+        if (lat !== 0 && lng !== 0) {
+            var map = L.map('confirm-map').setView([lat, lng], 16);
+            
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap'
+            }).addTo(map);
+            
+            L.marker([lat, lng]).addTo(map)
+                // 3. Nối chuỗi biến tên chi nhánh vào popup
+                .bindPopup("<b>" + tenChiNhanh + "</b><br>Hẹn gặp bạn tại đây!")
+                .openPopup();
+        } else {
+            document.getElementById('confirm-map').innerHTML = 
+                '<div class="d-flex align-items-center justify-content-center h-100 text-muted">Chưa có dữ liệu bản đồ</div>';
+        }
+    });
+</script>
+{% endblock %}
