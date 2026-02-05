@@ -1,6 +1,4 @@
-/* file: static/css/gis_map.css */
 
-/* === 1. RESET LAYOUT ĐỂ FULL MÀN HÌNH === */
 body { overflow: hidden; } 
 
 .gis-wrapper {
@@ -12,7 +10,7 @@ body { overflow: hidden; }
     background: #f8f9fa;
 }
 
-/* === 2. SIDEBAR TRÁI === */
+
 .gis-sidebar {
     width: 400px;
     height: 100%;
@@ -36,7 +34,7 @@ body { overflow: hidden; }
     text-transform: uppercase;
 }
 
-/* Ô tìm kiếm */
+
 .search-wrap { position: relative; margin-top: 15px; }
 .search-input {
     width: 100%;
@@ -49,7 +47,7 @@ body { overflow: hidden; }
 .search-input:focus { border-color: #0d6efd; background: #fff; box-shadow: 0 0 0 3px rgba(13,110,253,0.1); }
 .search-icon { position: absolute; left: 15px; top: 14px; color: #999; }
 
-/* Bộ lọc Tabs */
+
 .filter-group { display: flex; gap: 10px; margin-top: 15px; }
 .btn-filter {
     flex: 1; padding: 8px; border: 1px solid #eee; background: white;
@@ -65,7 +63,7 @@ body { overflow: hidden; }
     background: #fdfdfd;
 }
 
-/* === 3. THẺ KHÁCH HÀNG === */
+
 .cus-card {
     background: white;
     border: 1px solid #e5e7eb;
@@ -106,7 +104,7 @@ body { overflow: hidden; }
 }
 .btn-go-map:hover { background: #0d6efd; color: white; }
 
-/* === 4. BẢN ĐỒ BÊN PHẢI === */
+
 .gis-map-area {
     flex-grow: 1;
     height: 100%;

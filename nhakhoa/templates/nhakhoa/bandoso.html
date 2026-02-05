@@ -70,7 +70,7 @@
     const branches = JSON.parse("{{ json_chi_nhanh|escapejs }}");
     const bookings = JSON.parse("{{ json_lich_su|escapejs }}");
 
-    // 2. KHỞI TẠO BẢN ĐỒ
+
     var map = L.map('map', {zoomControl: false}).setView([10.7769, 106.7009], 13);
     
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -150,7 +150,7 @@
         render(filtered);
     }
 
-    // 5. CHỨC NĂNG DẪN ĐƯỜNG (ROUTING)
+
     var routingControl = null;
     var userMarker = null;
 
@@ -171,7 +171,8 @@
             
             userMarker = L.marker([uLat, uLng], {icon: userIcon}).addTo(map).bindPopup("Vị trí của bạn").openPopup();
             
-            // Tuyến đường đi
+
+
             routingControl = L.Routing.control({
                 waypoints: [L.latLng(uLat, uLng), L.latLng(dLat, dLng)],
                 lineOptions: { styles: [{color: '#0d6efd', opacity: 0.8, weight: 6}] },
@@ -180,7 +181,7 @@
                 addWaypoints: false
             }).addTo(map);
 
-            // Tính khoảng cách - thời gian khi tìm được lộ trình
+
             routingControl.on('routesfound', e => {
                 const summary = e.routes[0].summary;
                 document.getElementById('rbName').innerText = cName;
@@ -189,7 +190,7 @@
                 document.getElementById('routeBar').classList.add('show');
             });
 
-            // Zoom map bao quát lộ trình
+
             map.fitBounds(L.latLngBounds([[uLat, uLng], [dLat, dLng]]), {padding:[50,50]});
 
         }, () => alert("Không thể lấy vị trí GPS!"));

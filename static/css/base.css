@@ -1,4 +1,4 @@
-/* ================== RESET ================== */
+
 * {
     box-sizing: border-box;
     margin: 0;
@@ -13,7 +13,7 @@ body {
     overflow-x: hidden;
 }
 
-/* ================== COMMON ================== */
+
 .container {
     max-width: 1200px;
     margin: auto;
@@ -28,7 +28,7 @@ h2 {
     font-weight: 700;
 }
 
-/* ================== HEADER ================== */
+
 .top-header {
     display: flex;
     align-items: center;
@@ -80,10 +80,9 @@ h2 {
     background: #0b5ed7;
 }
 
-/* ================== BANNER ================== */
 .banner {
     height: 550px;
-    background-image: url("../images/banner.webp"); /* Kiểm tra lại tên file ảnh */
+    background-image: url("../images/banner.webp");
     background-size: cover;
     background-position: center;
     position: relative;
@@ -138,7 +137,7 @@ h2 {
     transform: scale(1.05);
 }
 
-/* ================== ABOUT (GIỚI THIỆU) ================== */
+
 .about {
     background: #ffffff;
 }
@@ -152,7 +151,7 @@ h2 {
     line-height: 1.8;
 }
 
-/* ================== ABOUT FEATURES (3 KHỐI ẢNH) ================== */
+
 .about-features {
     display: flex;
     justify-content: space-between;
@@ -193,7 +192,7 @@ h2 {
     color: #666;
 }
 
-/* ===== ABOUT BANNER ===== */
+
 .about-banner {
     height: 100vh;
     background-size: cover;
@@ -228,16 +227,13 @@ h2 {
     padding: 80px 0;
 }
 
-/* ================== TRANG DỊCH VỤ (SERVICE GRID) ================== */
-
-/* 1. Thiết lập lưới 3 cột */
 .service-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr); /* 3 cột đều nhau */
-    gap: 30px; /* Khoảng cách giữa các ô */
+    grid-template-columns: repeat(3, 1fr);
+    gap: 30px;
 }
 
-/* 2. Thẻ Card Dịch vụ */
+
 .service-card {
     background: white;
     border-radius: 15px;
@@ -249,14 +245,14 @@ h2 {
     flex-direction: column;
 }
 
-/* Hiệu ứng bay lên khi di chuột */
+
 .service-card:hover {
     transform: translateY(-10px);
     box-shadow: 0 20px 40px rgba(13, 110, 253, 0.15);
     border-color: #0d6efd;
 }
 
-/* 3. Ảnh dịch vụ */
+
 .service-img {
     height: 220px;
     overflow: hidden;
@@ -270,10 +266,10 @@ h2 {
 }
 
 .service-card:hover .service-img img {
-    transform: scale(1.1); /* Zoom ảnh khi hover */
+    transform: scale(1.1);
 }
 
-/* 4. Nội dung bên trong */
+
 .service-content {
     padding: 25px;
     text-align: center;
@@ -294,17 +290,17 @@ h2 {
     font-size: 14px;
     line-height: 1.5;
     margin-bottom: 15px;
-    flex-grow: 1; /* Đẩy giá và nút xuống đáy cho đều */
+    flex-grow: 1;
 }
 
 .service-content .price {
-    color: #d9534f; /* Màu đỏ cho giá */
+    color: #d9534f;
     font-weight: bold;
     font-size: 18px;
     margin-bottom: 20px;
 }
 
-/* 5. Nút Tư vấn */
+
 .btn-service {
     padding: 10px 25px;
     background: white;
@@ -321,28 +317,25 @@ h2 {
     color: white;
 }
 
-/* --- RESPONSIVE --- */
 @media (max-width: 900px) {
     .service-grid {
-        grid-template-columns: repeat(2, 1fr); /* Tablet: 2 cột */
+        grid-template-columns: repeat(2, 1fr);
     }
 }
 
 @media (max-width: 600px) {
     .service-grid {
-        grid-template-columns: 1fr; /* Mobile: 1 cột */
+        grid-template-columns: 1fr;
     }
 }
-/* ================== TRANG LIÊN HỆ (STYLE MỚI) ================== */
 
-/* 1. Layout chia cột */
 .contact-grid {
     display: flex;
     gap: 50px;
     align-items: flex-start;
 }
 
-/* 2. Style cột Thông tin (Bên trái) */
+
 .contact-info {
     flex: 1;
 }
@@ -361,7 +354,7 @@ h2 {
 }
 
 .info-box:hover {
-    transform: translateX(10px); /* Hiệu ứng trượt nhẹ sang phải */
+    transform: translateX(10px);
     border-color: #0d6efd;
 }
 
@@ -389,18 +382,18 @@ h2 {
 }
 
 .info-box .highlight {
-    color: #d9534f; /* Màu đỏ cho Hotline */
+    color: #d9534f;
     font-weight: bold;
     font-size: 18px;
 }
 
-/* 3. Style Form liên hệ (Bên phải) */
+
 .contact-form-wrapper {
     flex: 1;
     background: white;
     padding: 40px;
     border-radius: 15px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.08); /* Đổ bóng đậm tạo chiều sâu */
+    box-shadow: 0 10px 30px rgba(0,0,0,0.08);
     border: 1px solid #eee;
 }
 
@@ -451,9 +444,8 @@ h2 {
     transform: translateY(-2px);
 }
 
-/* ================== PHẦN CHĂM SÓC KHÁCH HÀNG ================== */
 .customer-care {
-    background-color: #f8f9fa; /* Nền xám nhẹ khác biệt */
+    background-color: #f8f9fa;
     padding: 80px 0;
 }
 
@@ -504,14 +496,13 @@ h2 {
     text-decoration: underline;
 }
 
-/* ================== RESPONSIVE (MOBILE) ================== */
 @media (max-width: 900px) {
     .contact-grid {
-        flex-direction: column; /* Xếp dọc trên mobile */
+        flex-direction: column;
     }
     
     .care-grid {
-        grid-template-columns: 1fr; /* 1 cột trên mobile */
+        grid-template-columns: 1fr;
     }
     
     .contact-form-wrapper {
@@ -519,15 +510,13 @@ h2 {
         padding: 25px;
     }
 }
-/* ================== HỆ THỐNG CHI NHÁNH (STYLE RIÊNG) ================== */
 
-/* 1. Khung nền chung */
 .branches {
     background-color: #f8f9fa;
     padding: 60px 0;
 }
 
-/* 2. Tiêu đề mục */
+
 .branches .section-title {
     text-align: center;
     color: #0d6efd;
@@ -537,21 +526,21 @@ h2 {
     text-transform: uppercase;
 }
 
-/* 3. LƯỚI 2 CỘT (QUAN TRỌNG) */
+
 .branch-list {
     display: grid;
-    /* repeat(2, 1fr) = Chia đôi màn hình thành 2 cột */
-    grid-template-columns: repeat(2, 1fr); 
-    gap: 30px; /* Khoảng cách giữa các ô */
+
+    grid-template-columns: repeat(2, 1fr);
+    gap: 30px;
     max-width: 1000px;
-    margin: 0 auto; /* Căn giữa danh sách */
+    margin: 0 auto;
 }
 
-/* 4. Thẻ Card từng chi nhánh */
+
 .branch-card {
     background: white;
     border-radius: 12px;
-    overflow: hidden; /* Bo tròn ảnh theo khung */
+    overflow: hidden;
     box-shadow: 0 5px 15px rgba(0,0,0,0.05);
     border: 1px solid #eee;
     display: flex;
@@ -559,31 +548,31 @@ h2 {
     transition: transform 0.3s ease;
 }
 
-/* Hiệu ứng khi di chuột vào card */
+
 .branch-card:hover {
-    transform: translateY(-5px); /* Bay lên nhẹ */
+    transform: translateY(-5px);
     box-shadow: 0 15px 30px rgba(13, 110, 253, 0.15);
 }
 
-/* 5. Khung ảnh (Cố định chiều cao để ảnh đều nhau) */
+
 .branch-img {
     width: 100%;
-    height: 280px; /* Chiều cao cố định */
+    height: 280px;
     overflow: hidden;
 }
 
 .branch-img img {
     width: 100%;
     height: 100%;
-    object-fit: cover; /* Cắt ảnh tự động để lấp đầy khung */
+    object-fit: cover;
     transition: transform 0.5s ease;
 }
 
 .branch-card:hover .branch-img img {
-    transform: scale(1.05); /* Zoom ảnh nhẹ khi hover */
+    transform: scale(1.05);
 }
 
-/* 6. Phần thông tin chữ */
+
 .branch-info {
     padding: 20px;
     text-align: center;
@@ -607,7 +596,7 @@ h2 {
     font-size: 15px;
 }
 
-/* 7. Nút xem bản đồ */
+
 .btn-map {
     display: inline-block;
     padding: 8px 20px;
@@ -624,12 +613,12 @@ h2 {
     color: white;
 }
 
-/* 8. RESPONSIVE (Điện thoại thì về 1 cột) */
+
 @media (max-width: 768px) {
     .branch-list {
-        grid-template-columns: 1fr; /* Về 1 cột dọc */
+        grid-template-columns: 1fr;
     }
     .branch-img {
-        height: 220px; /* Ảnh nhỏ lại chút trên đt */
+        height: 220px;
     }
 }

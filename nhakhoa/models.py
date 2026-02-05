@@ -1,8 +1,6 @@
 from django.db import models
 from django.utils import timezone
 
-
-# 1. MODEL DỊCH VỤ
 class DichVu(models.Model):
     ten_dich_vu = models.CharField(max_length=200, verbose_name="Tên dịch vụ")
     mo_ta = models.TextField(verbose_name="Mô tả ngắn")
@@ -16,13 +14,12 @@ class DichVu(models.Model):
         verbose_name = "Dịch vụ"
         verbose_name_plural = "1. Quản lý Dịch vụ"
 
-# 2. MODEL CHI NHÁNH & GIS (Đã nâng cấp)
 class ChiNhanh(models.Model):
     ten_chi_nhanh = models.CharField(max_length=200, verbose_name="Tên chi nhánh")
     dia_chi = models.CharField(max_length=500, verbose_name="Địa chỉ hiển thị")
     so_dien_thoai = models.CharField(max_length=20, default="0909.xxx.xxx", verbose_name="Hotline")
 
-    # --- TRƯỜNG DỮ LIỆU GIS (TỌA ĐỘ) ---
+
     kinh_do = models.CharField(
         max_length=50, 
         verbose_name="Kinh độ (Longitude)",
@@ -42,7 +39,6 @@ class ChiNhanh(models.Model):
         verbose_name_plural = "2. Quản lý Chi nhánh & Tọa độ"
 
 
-# 3. MODEL LỊCH HẸN
 
 class LichHen(models.Model):
     TRANG_THAI_CHOICES = [

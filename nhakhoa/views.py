@@ -2,15 +2,11 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-import json 
+import json
 
 
 from .models import DichVu, LichHen, ChiNhanh
 from .forms import DangKyForm, DangNhapForm
-
-
-# PHẦN 1: CÁC TRANG CHÍNH (FRONTEND)
-
 
 def index(request):
     """Trang chủ: Hiển thị Popup đặt lịch với danh sách Dịch vụ & Chi nhánh"""
@@ -35,9 +31,6 @@ def lienhe(request):
     return render(request, 'nhakhoa/lienhe.html', {'ds_dv': ds_dv, 'ds_cn': ds_cn})
 
 
-# PHẦN 2: CHỨC NĂNG GIS & BẢN ĐỒ (QUAN TRỌNG)
-
-
 def chinhanh(request):
     ds_cn = ChiNhanh.objects.all()
     ds_dv = DichVu.objects.all()
@@ -51,11 +44,9 @@ def ban_do_so(request):
     3. Hiển thị danh sách Lịch sử khách hàng (CÓ PHÂN QUYỀN).
     """
     
-    # --- 1. DỮ LIỆU CHO FORM ĐẶT LỊCH ---
     ds_dv = DichVu.objects.all()
     ds_cn = ChiNhanh.objects.all()
 
-    # --- 2. DỮ LIỆU CHO BẢN ĐỒ (MARKER CHI NHÁNH) ---
     data_chi_nhanh = []
     for cn in ds_cn:
         try:
@@ -72,18 +63,12 @@ def ban_do_so(request):
             })
         except ValueError: continue
     
-    # --- 3. DỮ LIỆU CHO SIDEBAR (LỊCH SỬ KHÁCH HÀNG - CÓ PHÂN QUYỀN) ---
-    
-  
     if request.user.is_authenticated:
         if request.user.is_staff:
-       
             ds_lich_hen = LichHen.objects.select_related('chi_nhanh', 'dich_vu').all().order_by('-id')
         else:
-     
             ds_lich_hen = LichHen.objects.select_related('chi_nhanh', 'dich_vu').filter(email=request.user.email).order_by('-id')
     else:
-  
         ds_lich_hen = []
     
 
@@ -106,7 +91,6 @@ def ban_do_so(request):
                 })
             except: continue
 
-  
     context = {
         'json_chi_nhanh': json.dumps(data_chi_nhanh),
         'json_lich_su': json.dumps(data_lich_su),
@@ -115,9 +99,6 @@ def ban_do_so(request):
     }
 
     return render(request, 'nhakhoa/bandoso.html', context)
-
-
-# PHẦN 3: CHỨC NĂNG TÀI KHOẢN (AUTH)
 
 
 def dangky(request):
@@ -154,10 +135,6 @@ def dangnhap(request):
 def dangxuat(request):
     logout(request)
     return redirect('index')
-
-
-# PHẦN 4: LOGIC ĐẶT LỊCH & XÁC NHẬN
-
 
 def dat_lich(request):
     """Xử lý form đặt lịch từ trang chủ"""
@@ -205,7 +182,6 @@ def xac_nhan_lich_hen(request, id_lich_hen):
     try:
         lich_hen = LichHen.objects.get(id=id_lich_hen)
         
-        # Logic GIS: Lấy tọa độ để truyền sang JavaScript
         if lich_hen.chi_nhanh:
             toa_do_lat = lich_hen.chi_nhanh.vi_do
             toa_do_lng = lich_hen.chi_nhanh.kinh_do

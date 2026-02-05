@@ -1,33 +1,32 @@
-/* ===== SUB BANNER (Cấu trúc chung) ===== */
+
 .sub-banner {
-    height: 350px;              /* Tăng chiều cao lên chút cho đẹp */
+    height: 350px;             
     position: relative;
     display: flex;
     align-items: center;
     justify-content: center;
     
-    /* --- KỸ THUẬT TRÀN VIỀN FULL MÀN HÌNH --- */
+
     width: 100vw;
     margin-left: calc(-50vw + 50%);
     margin-right: calc(-50vw + 50%);
 }
 
-/* ===== ABOUT BANNER (Ảnh nền riêng cho trang Giới thiệu) ===== */
+
 .about-banner {
-    /* SỬA LẠI ĐUÔI ẢNH CHO ĐÚNG VỚI FILE TRONG MÁY BẠN */
+
     background-image: url("../images/vechungtoi.avif");
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
 }
 
-/* ===== OVERLAY (Lớp phủ đen & Chữ) ===== */
 .sub-banner-overlay {
-    background: rgba(0, 0, 0, 0.5); /* Đen mờ 50% */
+    background: rgba(0, 0, 0, 0.5); 
     width: 100%;
     height: 100%;
     
-    /* Căn giữa nội dung */
+
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -49,10 +48,10 @@
     font-weight: 500;
 }
 
-/* ===== ABOUT PAGE CONTENT ===== */
+
 .about-page {
     background: #fff;
-    padding: 60px 0; /* Cách banner ra một đoạn */
+    padding: 60px 0; 
 }
 
 .about-flex {
@@ -81,7 +80,7 @@
     color: #555;
 }
 
-/* Responsive cho điện thoại */
+
 @media (max-width: 900px) {
     .about-flex {
         flex-direction: column;

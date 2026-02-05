@@ -99,7 +99,7 @@
             setTimeout(function(){ bigMap.invalidateSize(); }, 100);
         }
 
-        // Lấy vị trí người dùng & Vẽ đường
+        
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(function(position) {
                 var userLat = position.coords.latitude;
@@ -112,11 +112,11 @@
                     bigMap.removeControl(routingControl);
                 }
 
-                // Vẽ đường đi
+                
                 routingControl = L.Routing.control({
                     waypoints: [
-                        L.latLng(userLat, userLng),   // Điểm đi
-                        L.latLng(destLat, destLng)    // Điểm đến
+                        L.latLng(userLat, userLng),
+                        L.latLng(destLat, destLng)
                     ],
                     lineOptions: { styles: [{color: '#0d6efd', opacity: 0.8, weight: 6}] },
                     createMarker: function(i, wp, nWps) {
