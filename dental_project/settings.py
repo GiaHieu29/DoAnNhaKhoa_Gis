@@ -66,15 +66,12 @@ TEMPLATES = [
 WSGI_APPLICATION = "dental_project.wsgi.application"
 
 
-
-# settings.py
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'nhakhoa_db',
         'USER': 'postgres',
-        'PASSWORD': '123python manage.py migrate',
+        'PASSWORD': '123',
         'HOST': 'localhost',
         'PORT': '5432',
     }
