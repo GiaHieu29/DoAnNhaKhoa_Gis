@@ -1,0 +1,418 @@
+{% extends 'nhakhoa/base.html' %}
+{% load static %}
+
+{% block title %}Bản đồ số GIS - Nha Khoa Smile{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.css" />
+<script src="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.js"></script>
+
+<link rel="stylesheet" href="{% static 'css/gis_map.css' %}">
+
+<style>
+    /* CSS cho nút định vị GPS */
+    .leaflet-control-locate {
+        background-color: #fff;
+        width: 34px;
+        height: 34px;
+        border: 2px solid rgba(0,0,0,0.2);
+        background-clip: padding-box;
+        border-radius: 4px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #444;
+        transition: background-color 0.2s, color 0.2s;
+    }
+    .leaflet-control-locate:hover {
+        background-color: #f4f4f4;
+        color: #0d6efd;
+    }
+    .leaflet-control-locate i {
+        font-size: 16px;
+    }
+</style>
+
+<div class="gis-wrapper">
+    <div class="gis-sidebar">
+        <div class="sidebar-head">
+            <div class="app-title">
+                <i class="fas fa-map-marked-alt"></i> BẢN ĐỒ SỐ
+            </div>
+            <div class="text-muted small mb-3">Quản lý vị trí khách hàng & Chi nhánh</div>
+            
+            <div class="search-section">
+                <div class="text-dark small mb-1 fw-bold"><i class="fas fa-users me-1"></i> Tra cứu Khách hàng</div>
+                <div class="search-wrap">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" class="search-input" id="searchInp" placeholder="Tìm tên khách, SĐT..." onkeyup="filterList()">
+                </div>
+                
+                <div class="filter-group mt-2">
+                    <button class="btn-filter active">Tất cả</button>
+                    <button class="btn-filter">Đã đặt lịch</button>
+                    <button class="btn-filter">Đã hoàn thành</button>
+                </div>
+            </div>
+
+            <div class="search-section mt-3 pt-3 border-top">
+                <div class="text-dark small mb-1 fw-bold"><i class="fas fa-map-marker-alt me-1"></i> Tìm vị trí trên bản đồ</div>
+                <div class="search-wrap">
+                    <i class="fas fa-globe search-icon"></i>
+                    <input type="text" class="search-input" id="searchPlace" placeholder="VD: Hà Nội, Bến Thành...">
+                </div>
+                <button class="btn btn-sm btn-primary mt-2 w-100" onclick="searchPlace()">
+                    <i class="fas fa-search-location me-1"></i> Tìm trên bản đồ
+                </button>
+            </div>
+        </div>
+
+        <div class="customer-list" id="listArea">
+            <div class="text-center mt-5 text-muted">
+                <i class="fas fa-spinner fa-spin"></i> Đang tải dữ liệu...
+            </div>
+        </div>
+        
+        <div class="p-2 text-center small text-muted border-top">
+            Hệ thống có <b id="count">0</b> khách hàng đã đặt lịch
+        </div>
+    </div>
+
+    <div class="gis-map-area">
+        <div id="map"></div>
+        
+        <div class="route-bar" id="routeBar">
+            <div class="rb-item">
+                <div class="rb-label">Khách hàng</div>
+                <div class="rb-val text-primary" id="rbName">...</div>
+            </div>
+            <div class="rb-item">
+                <div class="rb-label">Khoảng cách</div>
+                <div class="rb-val text-danger" id="rbDist">...</div>
+            </div>
+            <div class="rb-item">
+                <div class="rb-label">Thời gian</div>
+                <div class="rb-val text-success" id="rbTime">...</div>
+            </div>
+            <button class="btn btn-sm btn-light rounded-circle shadow-sm" onclick="closeRoute()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const branches = JSON.parse("{{ json_chi_nhanh|escapejs }}");
+    const bookings = JSON.parse("{{ json_lich_su|escapejs }}");
+
+    // Khởi tạo bản đồ
+    var map = L.map('map', {zoomControl: false}).setView([10.7769, 106.7009], 13);
+    
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+        attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
+    }).addTo(map);
+
+    L.control.zoom({position: 'bottomright'}).addTo(map);
+
+    // ==========================================
+    // TẠO NÚT ĐỊNH VỊ GPS HIỆN TẠI
+    // ==========================================
+    var locateControl = L.control({position: 'bottomright'});
+    
+    locateControl.onAdd = function (map) {
+        var div = L.DomUtil.create('div', 'leaflet-control-locate');
+        div.innerHTML = '<i class="fas fa-crosshairs" title="Vị trí của tôi"></i>';
+        
+        div.onclick = function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            locateMe();
+        }
+        return div;
+    };
+    locateControl.addTo(map);
+
+    var myLocationMarker = null;
+
+    function locateMe() {
+        if (!navigator.geolocation) {
+            return alert("Trình duyệt hoặc thiết bị của bạn không hỗ trợ định vị GPS!");
+        }
+
+        const btnIcon = document.querySelector('.leaflet-control-locate i');
+        const oldClass = btnIcon.className;
+        btnIcon.className = 'fas fa-spinner fa-spin'; // Hiệu ứng đang tải
+
+        navigator.geolocation.getCurrentPosition(pos => {
+            const uLat = pos.coords.latitude.toFixed(6);
+            const uLng = pos.coords.longitude.toFixed(6);
+            
+            // 1. Bay đến vị trí tọa độ lấy được từ GPS
+            map.flyTo([uLat, uLng], 16);
+
+            // 2. Khởi tạo/Cập nhật marker với thông tin tạm thời
+            var userIcon = L.icon({ 
+                iconUrl: 'https://cdn-icons-png.flaticon.com/512/9131/9131546.png', 
+                iconSize: [40, 40], 
+                iconAnchor: [20, 40] 
+            });
+            
+            if (myLocationMarker) {
+                myLocationMarker.setLatLng([uLat, uLng]);
+            } else {
+                myLocationMarker = L.marker([uLat, uLng], {icon: userIcon}).addTo(map);
+            }
+
+            // Hiển thị nội dung chờ lấy địa chỉ
+            myLocationMarker.bindPopup(`
+                <div style="text-align: center;">
+                    <i class="fas fa-spinner fa-spin"></i> Đang xác định địa chỉ...<br>
+                    <small class="text-muted">Tọa độ: ${uLat}, ${uLng}</small>
+                </div>
+            `).openPopup();
+
+            // 3. Gọi API Nominatim để lấy địa chỉ chi tiết từ tọa độ (Thêm accept-language=vi-VN)
+            fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${uLat}&lon=${uLng}&accept-language=vi-VN,vi&addressdetails=1`)
+                .then(res => res.json())
+                .then(data => {
+                    let address = data.display_name ? data.display_name : "Không xác định được địa chỉ cụ thể";
+                    
+                    // Cập nhật lại nội dung Popup với đầy đủ thông tin
+                    myLocationMarker.setPopupContent(`
+                        <div style="min-width: 150px;">
+                            <b style="color: #0d6efd;"><i class="fas fa-street-view"></i> Vị trí hiện tại</b><br>
+                            <hr style="margin: 5px 0">
+                            <span style="font-size: 13px;"><b>Địa chỉ:</b> ${address}</span><br>
+                            <div class="mt-1" style="font-size: 11px; color: #666;">
+                                <b>Tọa độ:</b> ${uLat}, ${uLng}
+                            </div>
+                        </div>
+                    `);
+                    
+                    // Tự động điền vào ô tìm kiếm địa điểm
+                    document.getElementById('searchPlace').value = address;
+                    
+                    btnIcon.className = oldClass; // Trả lại icon ban đầu
+                })
+                .catch(() => {
+                    myLocationMarker.setPopupContent(`<b>Vị trí của bạn</b><br>Tọa độ: ${uLat}, ${uLng}<br><small>(Lỗi tải địa chỉ)</small>`);
+                    btnIcon.className = oldClass;
+                });
+
+        }, err => {
+            btnIcon.className = 'fas fa-crosshairs';
+            alert("Không thể lấy vị trí GPS! Hãy đảm bảo bạn đã cấp quyền truy cập vị trí.");
+        }, {
+            enableHighAccuracy: true,
+            timeout: 8000
+        });
+    }
+    // ==========================================
+
+    // Hiển thị marker các chi nhánh
+    var clinicIcon = L.icon({ iconUrl: 'https://cdn-icons-png.flaticon.com/512/3063/3063176.png', iconSize: [40, 40], iconAnchor: [20, 40], popupAnchor: [0, -40] });
+    
+    branches.forEach(b => {
+        L.marker([b.lat, b.lng], {icon: clinicIcon})
+            .addTo(map)
+            .bindPopup(`<b>${b.ten}</b><br>${b.dia_chi}`);
+    });
+
+    // Xử lý danh sách khách hàng
+    const listArea = document.getElementById('listArea');
+    
+    function render(data) {
+        listArea.innerHTML = "";
+        document.getElementById('count').innerText = data.length;
+
+        if(data.length === 0) {
+            listArea.innerHTML = "<div class='text-center mt-5 text-muted'>Không tìm thấy khách hàng nào</div>";
+            return;
+        }
+
+        data.forEach((item) => {
+            const el = document.createElement('div');
+            el.className = 'cus-card';
+            
+            el.innerHTML = `
+                <div class="card-top">
+                    <div>
+                        <div class="c-name">${item.ten_khach}</div>
+                        <div class="small text-muted">Hồ sơ #${item.id}</div>
+                    </div>
+                    <span class="c-badge">Đã đặt lịch</span>
+                </div>
+                
+                <div class="c-row">
+                    <i class="fas fa-tooth text-info"></i>
+                    <span>${item.dich_vu}</span>
+                </div>
+                <div class="c-row">
+                    <i class="fas fa-map-marker-alt text-danger"></i>
+                    <span>Đến: <b>${item.ten_chi_nhanh}</b></span>
+                </div>
+
+                <button class="btn-go-map" onclick="runRoute(${item.lat}, ${item.lng}, '${item.ten_chi_nhanh}', '${item.ten_khach}')">
+                    <i class="fas fa-directions"></i> Xem Đường Đi
+                </button>
+            `;
+            
+            el.addEventListener('click', (e) => {
+                if(e.target.tagName !== 'BUTTON' && e.target.tagName !== 'I') {
+                    map.flyTo([item.lat, item.lng], 15);
+                }
+            });
+            listArea.appendChild(el);
+        });
+    }
+    
+    render(bookings);
+
+    function filterList() {
+        const txt = document.getElementById('searchInp').value.toLowerCase();
+        const filtered = bookings.filter(b => 
+            b.ten_khach.toLowerCase().includes(txt) || 
+            b.sdt.includes(txt)
+        );
+        render(filtered);
+    }
+
+    // Xử lý chỉ đường (Routing)
+    var routingControl = null;
+    var userMarker = null;
+
+    function runRoute(dLat, dLng, dName, cName) {
+        if(!navigator.geolocation) return alert("Vui lòng bật GPS trên thiết bị!");
+        
+        if(routingControl) map.removeControl(routingControl);
+        if(userMarker) map.removeLayer(userMarker);
+
+        navigator.geolocation.getCurrentPosition(pos => {
+            const uLat = pos.coords.latitude;
+            const uLng = pos.coords.longitude;
+            
+            var routeUserIcon = L.icon({ iconUrl: 'https://cdn-icons-png.flaticon.com/512/9131/9131546.png', iconSize: [40, 40], iconAnchor: [20, 40] });
+
+            userMarker = L.marker([uLat, uLng], {icon: routeUserIcon}).addTo(map).bindPopup("Vị trí của bạn").openPopup();
+            
+            routingControl = L.Routing.control({
+                waypoints: [L.latLng(uLat, uLng), L.latLng(dLat, dLng)],
+                lineOptions: { styles: [{color: '#0d6efd', opacity: 0.8, weight: 6}] },
+                createMarker: () => null, 
+                show: false, 
+                addWaypoints: false
+            }).addTo(map);
+
+            routingControl.on('routesfound', e => {
+                const summary = e.routes[0].summary;
+                document.getElementById('rbName').innerText = cName;
+                document.getElementById('rbDist').innerText = (summary.totalDistance/1000).toFixed(2) + ' km';
+                document.getElementById('rbTime').innerText = Math.round(summary.totalTime/60) + ' phút';
+                document.getElementById('routeBar').classList.add('show');
+            });
+
+            map.fitBounds(L.latLngBounds([[uLat, uLng], [dLat, dLng]]), {padding:[50,50]});
+
+        }, () => alert("Không thể lấy vị trí GPS!"));
+    }
+
+    function closeRoute() {
+        document.getElementById('routeBar').classList.remove('show');
+        if(routingControl) map.removeControl(routingControl);
+        if(userMarker) map.removeLayer(userMarker);
+    }
+
+    // Tìm kiếm địa điểm
+    var searchMarker = null;
+
+    function searchPlace() {
+        const keyword = document.getElementById("searchPlace").value;
+
+        if(!keyword) {
+            alert("Nhập địa điểm cần tìm!");
+            return;
+        }
+
+        fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${keyword}&accept-language=vi-VN,vi`)
+            .then(res => res.json())
+            .then(data => {
+                if(data.length === 0) {
+                    alert("Không tìm thấy địa điểm!");
+                    return;
+                }
+
+                const place = data[0];
+                const lat = parseFloat(place.lat);
+                const lon = parseFloat(place.lon);
+
+                if(searchMarker) map.removeLayer(searchMarker);
+
+                searchMarker = L.marker([lat, lon])
+                    .addTo(map)
+                    .bindPopup(`
+                        <b>${place.display_name}</b><br>
+                        Lat: ${lat}<br>
+                        Lng: ${lon}
+                    `)
+                    .openPopup();
+
+                map.setView([lat, lon], 16);
+            })
+            .catch(() => alert("Lỗi khi tìm địa điểm!"));
+    }
+
+    // Xử lý sự kiện click trên bản đồ (Lấy tọa độ và địa chỉ)
+    var clickMarker;
+
+    map.on('click', function(e) {
+        const lat = e.latlng.lat.toFixed(6);
+        const lng = e.latlng.lng.toFixed(6);
+
+        if(clickMarker) map.removeLayer(clickMarker);
+
+        // Hiển thị marker tạm thời với trạng thái đang tải
+        clickMarker = L.marker([lat, lng])
+            .addTo(map)
+            .bindPopup(`
+                <div style="text-align: center;">
+                    <i class="fas fa-spinner fa-spin"></i> Đang tải địa chỉ...<br>
+                    <small class="text-muted">Lat: ${lat} | Lng: ${lng}</small>
+                </div>
+            `)
+            .openPopup();
+
+        // Gọi API của Nominatim để dịch ngược tọa độ thành địa chỉ (Thêm accept-language=vi-VN)
+        fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&accept-language=vi-VN,vi`)
+            .then(res => res.json())
+            .then(data => {
+                let address = data.display_name ? data.display_name : "Không tìm thấy địa chỉ cụ thể tại đây";
+                
+                // Cập nhật popup trên bản đồ
+                clickMarker.setPopupContent(`
+                    <div style="min-width: 150px;">
+                        <b>📍 Vị trí bạn chọn</b><br>
+                        <hr style="margin: 5px 0">
+                        <span style="color: #d9534f; font-weight: bold; font-size: 13px;">Địa chỉ:</span> <span style="font-size: 13px;">${address}</span><br>
+                        <small class="text-muted">Lat: ${lat} | Lng: ${lng}</small>
+                    </div>
+                `);
+
+                // Tự động điền địa chỉ vào ô tìm kiếm
+                if (data.display_name) {
+                    document.getElementById('searchPlace').value = data.display_name;
+                }
+            })
+            .catch(() => {
+                clickMarker.setPopupContent(`
+                    <b>📍 Vị trí bạn chọn</b><br>
+                    <span style="color: #d9534f;">Lỗi không tải được địa chỉ</span><br>
+                    <small class="text-muted">Lat: ${lat} | Lng: ${lng}</small>
+                `);
+            });
+    });
+
+</script>
+{% endblock %}

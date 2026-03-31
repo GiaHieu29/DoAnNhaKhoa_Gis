@@ -1,0 +1,130 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>{% block title %}Phòng khám nha khoa{% endblock %}</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <link rel="stylesheet" href="{% static 'css/base.css' %}">
+    <link rel="stylesheet" href="{% static 'css/popup.css' %}">
+    <link rel="stylesheet" href="{% static 'css/header.css' %}">
+    <link rel="stylesheet" href="{% static 'css/footer.css' %}"> </head>
+
+<body class="d-flex flex-column min-vh-100">
+
+    <header class="clinic-header">
+        <div class="clinic-header-inner">
+            <div class="left-group">
+                <a href="{% url 'index' %}" class="logo">
+                    <img src="https://cdn-icons-png.flaticon.com/512/190/190411.png" alt="Logo">
+                    <span>NHA KHOA SMILE</span>
+                </a>
+                <nav class="clinic-menu">
+                    <a href="{% url 'index' %}">Trang chủ</a>
+                    <a href="{% url 'gioithieu' %}">Giới thiệu</a>
+                    <a href="{% url 'dichvu' %}">Dịch vụ</a>
+                    <a href="{% url 'chinhanh' %}">Chi nhánh</a>
+                    <a href="{% url 'ban_do_so' %}">Bản đồ số</a>
+                    <a href="{% url 'lienhe' %}">Liên hệ</a>
+                </nav>
+            </div>
+            <div class="header-right">
+                {% if user.is_authenticated %}
+                    <div class="user-welcome">
+                        <i class="fas fa-user-circle text-primary" style="font-size: 16px;"></i>
+                        <span>{{ user.username }}</span>
+                        <span style="color: #ccc;">|</span>
+                        {% if user.is_staff %}
+                            <a href="/admin/" class="text-primary text-decoration-none"><i class="fas fa-cog"></i></a>
+                        {% endif %}
+                        <a href="{% url 'lich_su' %}" class="text-warning text-decoration-none"><i class="fas fa-history"></i></a>
+                        <a href="{% url 'dangxuat' %}" class="text-danger text-decoration-none"><i class="fas fa-sign-out-alt"></i></a>
+                    </div>
+                {% else %}
+                    <a href="{% url 'dangnhap' %}" style="font-size:14px; font-weight:600; text-decoration:none; color:#333;">Đăng nhập</a>
+                {% endif %}
+                <a href="#" onclick="openPopup()" class="btn-book">Đặt lịch ngay</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-grow-1">
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="clinic-footer">
+        <div class="container">
+            <div class="row">
+                
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="footer-logo-box">
+                        <img src="https://cdn-icons-png.flaticon.com/512/190/190411.png" width="40" alt="Logo">
+                        <span class="footer-logo-text">Nha Khoa Smile</span>
+                    </div>
+                    <p class="footer-desc">
+                        Hệ thống nha khoa tiêu chuẩn quốc tế 5 sao. Chúng tôi cam kết mang lại nụ cười rạng rỡ và sức khỏe răng miệng hoàn hảo nhất cho cộng đồng Việt.
+                    </p>
+                    <div class="social-links">
+                        <a href="#" class="social-btn"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="social-btn"><i class="fab fa-youtube"></i></a>
+                        <a href="#" class="social-btn"><i class="fab fa-tiktok"></i></a>
+                        <a href="#" class="social-btn"><i class="fab fa-instagram"></i></a>
+                    </div>
+                </div>
+
+                <div class="col-lg-3 col-md-6 mb-4 ps-lg-5">
+                    <h5 class="footer-heading">Liên Kết Nhanh</h5>
+                    <ul class="footer-links">
+                        <li><a href="{% url 'index' %}"><i class="fas fa-chevron-right"></i> Trang chủ</a></li>
+                        <li><a href="{% url 'gioithieu' %}"><i class="fas fa-chevron-right"></i> Về chúng tôi</a></li>
+                        <li><a href="{% url 'dichvu' %}"><i class="fas fa-chevron-right"></i> Dịch vụ nha khoa</a></li>
+                        <li><a href="{% url 'chinhanh' %}"><i class="fas fa-chevron-right"></i> Hệ thống chi nhánh</a></li>
+                        <li><a href="{% url 'lienhe' %}"><i class="fas fa-chevron-right"></i> Liên hệ tư vấn</a></li>
+                    </ul>
+                </div>
+
+                <div class="col-lg-5 col-md-12 mb-4">
+                    <h5 class="footer-heading">Thông Tin Liên Hệ</h5>
+                    
+                    <div class="contact-row">
+                        <div class="contact-icon-box"><i class="fas fa-map-marker-alt"></i></div>
+                        <div class="contact-text">
+                            <strong>Trụ sở chính:</strong>
+                            <span>123 Đường Nguyễn Huệ, Phường Bến Nghé, Quận 1, TP. Hồ Chí Minh</span>
+                        </div>
+                    </div>
+
+                    <div class="contact-row">
+                        <div class="contact-icon-box"><i class="fas fa-phone-volume"></i></div>
+                        <div class="contact-text">
+                            <strong>Hotline 24/7:</strong>
+                            <span style="font-size:16px; color:#fff; font-weight:bold;">0909.123.456</span>
+                        </div>
+                    </div>
+
+                    <div class="contact-row">
+                        <div class="contact-icon-box"><i class="fas fa-envelope-open-text"></i></div>
+                        <div class="contact-text">
+                            <strong>Email hỗ trợ:</strong>
+                            <span>nhakhoasmile@gmail.com</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </footer>
+    {% include "nhakhoa/components/popup.html" %}
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function openPopup() { document.getElementById("popup").style.display = "flex"; }
+        function closePopup() { document.getElementById("popup").style.display = "none"; }
+    </script>
+</body>
+</html>
